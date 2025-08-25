@@ -14,7 +14,7 @@ import jwt from 'jsonwebtoken';
 * @param {string} password - The plain text password (hashed in the repository).
 * @returns {Promise<object>} The newly created user.
  */
-export const registerUser = async (username, email, password) => {
+export const registerUser = async (username, email, password, code_name) => {
     if (!validateEmail(email)) throw new Error('Invalid email format');
     if (!validatePassword(password)) throw new Error('Invalid password format');
     if (!validateUsername(username)) throw new Error('Invalid username format');
@@ -23,7 +23,7 @@ export const registerUser = async (username, email, password) => {
     if(user){
         throw new Error('User already exists');
     }
-    const newUser = await authRepository.createUser({ username, email, password });
+    const newUser = await authRepository.createUser({ username, email, password, code_name });
     return newUser;
 }
 
@@ -52,4 +52,3 @@ export const loginUser = async (email, password) => {
         );
     return { user, token };
 }
- 

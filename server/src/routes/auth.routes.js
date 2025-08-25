@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getProfile } from '../controllers/auth.controller.js'
+import { register, login, getProfile,logout} from '../controllers/auth.controller.js'
 import { authMiddleware as verifyToken } from '../middlewares/auth.middleware.js'
 
 const router = Router();
@@ -23,6 +23,9 @@ router.post('/login', login)
  * @desc Returns the information of the authenticated user (extracted from the JWT).
  * @access Private (requires valid token in the cookie)
  */
-router.get("/profile", verifyToken, getProfile);
+router.get('/profile', verifyToken, getProfile);
+
+
+router.post('/logout',logout)
 
 export default router;

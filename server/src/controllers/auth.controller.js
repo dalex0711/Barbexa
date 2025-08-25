@@ -2,9 +2,9 @@ import * as authService from '../services/auth.service.js'
 
 // User registration
 export const register = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, code_name } = req.body;
     try {
-        const user = await authService.registerUser(username, email, password);
+        const user = await authService.registerUser(username, email, password,code_name);
         res.status(201).json(user);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -36,8 +36,18 @@ export const login = async (req, res) => {
 
 // User profile authentication
 export const getProfile = (req, res) => {
-  res.json({
+    res.json({
     message: "User profile",
     user: req.user
-  });
+    });
 };
+
+export const logout = async(req,res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure:false,
+        sameSite: 'Strict'
+
+    });
+    res.json({ message : 'logout successfully'})
+}

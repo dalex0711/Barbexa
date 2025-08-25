@@ -2,7 +2,7 @@ import {pool} from '../config/db.js';
 import bcrypt from 'bcrypt';
 
 export const authRepository = {
-     /**
+    /**
      * Search for a user in the database using their email address.
      * @param {string} email - The email address of the user to search for.
      * @returns {Promise<Object|null>} - Returns the user object if found, otherwise null.
@@ -21,7 +21,7 @@ export const authRepository = {
      */
     async createUser(user) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
-        const [result] = await pool.query('INSERT INTO users (username, email, password, enabled, rol_id) VALUES (?, ?, ?, ?, ?)', [user.username, user.email, hashedPassword, 1, 3]);
+        const [result] = await pool.query('INSERT INTO users (username, email, password, enabled, rol_id) VALUES (?, ?, ?, ?, (SELECT id FROM rol WHERE code_name = ?))', [user.username, user.email, hashedPassword, 1, user.code_name]);
         return {message :"User created successfully"};
     }
 };
