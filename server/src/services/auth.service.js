@@ -40,13 +40,14 @@ export const loginUser = async (email, password) => {
     if (!validatePassword(password)) throw new Error('Invalid password format');
 
     const user = await authRepository.findUserByEmail(email);
+    console.log(user)
     if (!user) throw new Error('User not found');
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) throw new Error('Invalid password');
 
     const token = jwt.sign(
-        { id: user.id,username: user.username, rol: user.rol_id },
+        { id: user.id,username: user.username, rol: user.code_name },
         config.jwt.secret,
         { expiresIn: config.jwt.expires }
         );

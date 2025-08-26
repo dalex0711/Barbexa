@@ -19,3 +19,10 @@ export const authMiddleware = (req,res,next) => {
         res.status(401).json({error: 'Invalid token.'});
     }
 }
+
+export const adminMiddleware = (req,res,next) => {
+    if(req.user?.code_name === 'ADMIN_01'){
+        return next();
+    }
+    return res.status(403).json({error: 'Access denied.'});
+}
