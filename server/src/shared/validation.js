@@ -1,3 +1,6 @@
+import dayjs from "dayjs";
+
+
 /**
  * Validates whether an email is formatted correctly.
  * 
@@ -28,7 +31,7 @@ export function validatePassword(password) {
  * @param {string} username
  * @returns {boolean}
  */
-export function validateUsername(username) {
+export function validateName(username) {
     const minLength = 1;
     const maxLength = 50;
     const hasNoSpecialChars = /^[a-zA-Z0-9_]+$/.test(username);
@@ -37,4 +40,18 @@ export function validateUsername(username) {
         username.length <= maxLength &&
         hasNoSpecialChars
     );
+}
+
+export function isDecimal(price) {
+  return !Number.isInteger(price);
+}
+
+
+export function isValidTime(time) {
+  return dayjs(time, "HH:mm:ss", true).isValid();
+}
+
+export function decripValidate(description) {
+  const maxLength = 255;
+  return description.length >= maxLength;
 }

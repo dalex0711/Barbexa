@@ -1,5 +1,5 @@
 import {authRepository} from '../repositories/auth.repository.js'
-import { validateEmail,validatePassword,validateUsername} from '../shared/validation.js'
+import { validateEmail,validatePassword,validateName} from '../shared/validation.js'
 import {config} from '../config/index.js'
 
 import bcrypt from 'bcrypt';
@@ -17,7 +17,7 @@ import jwt from 'jsonwebtoken';
 export const registerUser = async (username, email, password, code_name) => {
     if (!validateEmail(email)) throw new Error('Invalid email format');
     if (!validatePassword(password)) throw new Error('Invalid password format');
-    if (!validateUsername(username)) throw new Error('Invalid username format');
+    if (!validateName(username)) throw new Error('Invalid username format');
 
     const user = await authRepository.findUserByEmail({ email });
     if(user){
@@ -40,14 +40,14 @@ export const loginUser = async (email, password) => {
     if (!validatePassword(password)) throw new Error('Invalid password format');
 
     const user = await authRepository.findUserByEmail(email);
-    console.log(user)
     if (!user) throw new Error('User not found');
+    const code_name = await authRepository.getRoleById(user.rol_id);
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) throw new Error('Invalid password');
 
     const token = jwt.sign(
-        { id: user.id,username: user.username, rol: user.code_name },
+        { id: user.id,username: user.username, code_name: code_name },
         config.jwt.secret,
         { expiresIn: config.jwt.expires }
         );

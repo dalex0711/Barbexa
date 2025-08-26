@@ -23,5 +23,10 @@ export const authRepository = {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         const [result] = await pool.query('INSERT INTO users (username, email, password, enabled, rol_id) VALUES (?, ?, ?, ?, (SELECT id FROM rol WHERE code_name = ?))', [user.username, user.email, hashedPassword, 1, user.code_name]);
         return {message :"User created successfully"};
+    },
+
+    async getRoleById(id_rol){
+        const [rows] = await pool.query('SELECT code_name FROM rol WHERE id = ?', [id_rol]);
+        return rows[0].code_name;
     }
 };
