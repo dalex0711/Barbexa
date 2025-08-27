@@ -1,4 +1,7 @@
-/** centralization of environment variables */
+/**
+ * Application configuration object.
+ * Includes app settings, database connection, and JWT options.
+ */
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -10,7 +13,7 @@ export const config = {
     bd:  {
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || '123',
+        password: process.env.DB_PASSWORD || 'Root123!',
         database: process.env.DB_NAME || 'barbexa',
         port: process.env.DB_PORT || 3306
     },

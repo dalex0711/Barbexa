@@ -1,14 +1,26 @@
 import express from 'express';
 import authRoutes from './src/routes/auth.routes.js';
 import servicesRoutes from './src/routes/services.routes.js';
+import userRoutes from './src/routes/users.routes.js';
+import reservationsRoutes from './src/routes/reservations.routes.js';
+import { errorMiddleware } from "./src/middlewares/error.js";
 import cookieParser from "cookie-parser";
+import cors from "cors"; 
 
 const app = express();
 
-app.use(express.json());
-app.use(cookieParser()); 
+// Core middlewares
+app.use(express.json());       // Parse incoming JSON payloads
+app.use(cookieParser());       // Parse cookies for authentication/session handling
+app.use(cors());               // Enable Cross-Origin Resource Sharing (CORS)
 
-app.use(authRoutes);
-app.use(servicesRoutes);
+// API routes
+app.use(authRoutes);           // Authentication & authorization endpoints
+app.use(servicesRoutes);       // Services catalog endpoints
+app.use(userRoutes);           // User management endpoints
+app.use(reservationsRoutes);   // Reservations endpoints
+
+// Global error handler (must be last)
+app.use(errorMiddleware);
 
 export default app;

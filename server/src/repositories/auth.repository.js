@@ -1,32 +1,54 @@
-import {pool} from '../config/db.js';
+import { pool } from '../config/db.js';
 import bcrypt from 'bcrypt';
 
 export const authRepository = {
     /**
-     * Search for a user in the database using their email address.
-     * @param {string} email - The email address of the user to search for.
-     * @returns {Promise<Object|null>} - Returns the user object if found, otherwise null.
+     * Finds a user by email.
+     *
+     * @param {string} email - Email address to search for
+     * @returns {Promise<object|null>} User record if found, otherwise null
      */
     async findUserByEmail(email) {
-        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [rows] = await pool.query(
+            'SELECT * FROM users WHERE email = ?',
+            [email]
+        );
         return rows[0];
     },
+
     /**
      * Creates a new user in the database.
-     * @param {Object} user - User data to create.
-     * @param {string} user.username - Username.
-     * @param {string} user.email - Unique email address.
-     * @param {string} user.password - Plain text password (will be hashed here).
-     * @returns {Promise<Object>} - Confirmation message of creation.
+     * - Password is hashed before storage.
+     * - Role is resolved from the rol table using code_name.
+     *
+     * @param {object} user - User data
+     * @param {string} user.username - User's username
+     * @param {string} user.email - Unique email address
+     * @param {string} user.password - Plain text password (hashed here)
+     * @param {string} user.code_name - Role code name (must exist in rol table)
+     * @returns {Promise<{message: string}>} Confirmation message
      */
     async createUser(user) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
-        const [result] = await pool.query('INSERT INTO users (username, email, password, enabled, rol_id) VALUES (?, ?, ?, ?, (SELECT id FROM rol WHERE code_name = ?))', [user.username, user.email, hashedPassword, 1, user.code_name]);
-        return {message :"User created successfully"};
+        await pool.query(
+            `INSERT INTO users (username, email, password, enabled, rol_id)
+             VALUES (?, ?, ?, ?, (SELECT id FROM rol WHERE code_name = ?))`,
+            [user.username, user.email, hashedPassword, 1, user.code_name]
+        );
+        return { message: "User created successfully" };
     },
 
-    async getRoleById(id_rol){
-        const [rows] = await pool.query('SELECT code_name FROM rol WHERE id = ?', [id_rol]);
+    /**
+     * Retrieves role code_name by role ID.
+     *
+     * @param {number} id_rol - Role ID
+     * @returns {Promise<string>} Role code name
+     */
+    async getRoleById(id_rol) {
+        const [rows] = await pool.query(
+            'SELECT code_name FROM rol WHERE id = ?',
+            [id_rol]
+        );
         return rows[0].code_name;
     }
 };
