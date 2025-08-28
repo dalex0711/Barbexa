@@ -1,40 +1,14 @@
 // server/src/repositories/reservations.repository.js
 import { pool } from "../config/db.js";
 
-/* ============================
-   Utility functions
-============================ */
-
-/**
- * Builds a SQL IN clause with the correct number of placeholders.
- * Example: inClause([1,2,3]) -> "(?,?,?)"
- *
- * @param {Array<any>} arr - Array of values for the IN clause
- * @returns {string} SQL IN clause string
- */
 const inClause = (arr) => `(${arr.map(() => "?").join(",")})`;
-
-/**
- * Ensures the array is not empty, throws an error otherwise.
- *
- * @param {Array<any>} arr - Input array
- * @param {string} msg - Error message if invalid
- * @throws {Error} If array is empty or not valid
- */
 const assertNonEmptyArray = (arr, msg) => {
   if (!Array.isArray(arr) || arr.length === 0) throw new Error(msg);
 };
 
 /* ============================
-   Validation queries
+   Validaciones
 ============================ */
-
-/**
- * Ensures all given services exist and are enabled.
- *
- * @param {number[]} serviceIds - Array of service IDs
- * @throws {Error} If any service is disabled or does not exist
- */
 export const assertServicesEnabled = async (serviceIds) => {
   assertNonEmptyArray(serviceIds, "Debe enviar al menos un service_id");
   const [rows] = await pool.query(
@@ -49,13 +23,6 @@ export const assertServicesEnabled = async (serviceIds) => {
   }
 };
 
-/**
- * Ensures a barber provides all requested services.
- *
- * @param {number} barber_id - Barber ID
- * @param {number[]} serviceIds - Array of service IDs
- * @throws {Error} If barber does not provide all services
- */
 export const assertBarberProvidesServices = async (barber_id, serviceIds) => {
   assertNonEmptyArray(serviceIds, "Debe enviar al menos un service_id");
   const params = [barber_id, ...serviceIds];
@@ -72,15 +39,10 @@ export const assertBarberProvidesServices = async (barber_id, serviceIds) => {
 };
 
 /**
- * Calculates total minutes from service durations.
- * - Only enabled services are included.
- * - Uses TIME_TO_SEC(duration)/60 to convert TIME to minutes.
- *
- * @param {number[]} serviceIds - Array of service IDs
- * @returns {Promise<number>} Total duration in minutes
+ * Retorna minutos totales sumando TIME duration de servicios habilitados.
  */
 export const getTotalServiceMinutes = async (serviceIds) => {
-  assertNonEmptyArray(serviceIds, "Debe enviar al menos un service_id");
+  if (!Array.isArray(serviceIds) || serviceIds.length === 0) return 0;
   const [rows] = await pool.query(
     `SELECT COALESCE(SUM(TIME_TO_SEC(duration))/60,0) AS total_minutes
        FROM services
@@ -92,13 +54,7 @@ export const getTotalServiceMinutes = async (serviceIds) => {
 };
 
 /**
- * Checks if a reservation overlaps with existing ones for the same barber.
- * Active states considered: 1=PENDIENTE, 2=CONFIRMADA, 3=EN_PROCESO.
- *
- * @param {number} barber_id - Barber ID
- * @param {Date} start_at - Proposed start time
- * @param {Date} end_at - Proposed end time
- * @returns {Promise<boolean>} True if overlap exists, false otherwise
+ * Valida si existe choque de horario para el barbero en el rango.
  */
 export const existsOverlap = async (barber_id, start_at, end_at) => {
   const [rows] = await pool.query(
@@ -114,25 +70,8 @@ export const existsOverlap = async (barber_id, start_at, end_at) => {
 };
 
 /* ============================
-   Transactional creation
+   Crear reserva (con combos)
 ============================ */
-
-/**
- * Creates a reservation and related services transactionally.
- * - Inserts into reservations table
- * - Inserts into reservation_service table
- * - Commits both or rolls back on error
- *
- * @param {object} data - Reservation data
- * @param {number} data.status_id - Reservation status
- * @param {number} data.client_id - Client ID
- * @param {number} data.barber_id - Barber ID
- * @param {string|null} data.notes - Optional notes
- * @param {Date} data.start_at - Start datetime
- * @param {Date} data.end_at - End datetime
- * @param {number[]} data.services - Array of service IDs
- * @returns {Promise<object>} Created reservation with related services
- */
 export const createReservationTx = async ({
   status_id,
   client_id,
@@ -140,15 +79,14 @@ export const createReservationTx = async ({
   notes,
   start_at,
   end_at,
-  services,
+  services = [],
+  combos = []
 }) => {
-  assertNonEmptyArray(services, "Debe enviar al menos un service_id");
-
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
-    // Insert reservation
+    // Insert principal
     const [ins] = await conn.query(
       `INSERT INTO reservations
          (status_id, client_id, barber_id, notas, start_at, end_at)
@@ -157,16 +95,27 @@ export const createReservationTx = async ({
     );
     const reservation_id = ins.insertId;
 
-    // Insert related services
-    const values = services.map((sid) => [sid, reservation_id]);
-    await conn.query(
-      `INSERT INTO reservation_service (service_id, reservation_id) VALUES ?`,
-      [values]
-    );
+    // Insert detalle: servicios
+    if (Array.isArray(services) && services.length) {
+      const values = services.map((sid) => [sid, reservation_id]);
+      await conn.query(
+        `INSERT INTO reservation_service (service_id, reservation_id) VALUES ?`,
+        [values]
+      );
+    }
+
+    // Insert detalle: combos
+    if (Array.isArray(combos) && combos.length) {
+      const values = combos.map((cid) => [cid, reservation_id]);
+      await conn.query(
+        `INSERT INTO reservation_combo (combo_id, reservation_id) VALUES ?`,
+        [values]
+      );
+    }
 
     await conn.commit();
 
-    // Return reservation with joined details
+    // Retornar reserva con detalles
     const [resRows] = await conn.query(
       `SELECT r.*,
               s.name AS status_name,
@@ -180,6 +129,7 @@ export const createReservationTx = async ({
       [reservation_id]
     );
 
+    // Servicios
     const [svcRows] = await conn.query(
       `SELECT sv.id, sv.name, sv.price, sv.duration
          FROM reservation_service rs
@@ -188,8 +138,30 @@ export const createReservationTx = async ({
       [reservation_id]
     );
 
+    // Combos
+    const [comboRows] = await conn.query(
+      `SELECT c.id, c.name, c.price, c.discount_percent, c.duration_override
+         FROM reservation_combo rc
+         JOIN combos c ON c.id = rc.combo_id
+        WHERE rc.reservation_id = ?`,
+      [reservation_id]
+    );
+    for (const c of comboRows) {
+      const [items] = await conn.query(
+        `SELECT s.id AS service_id, s.name, s.price, s.duration, cs.quantity
+           FROM combo_services cs
+           JOIN services s ON s.id = cs.service_id
+          WHERE cs.combo_id = ?`,
+        [c.id]
+      );
+      c.items = items;
+    }
+
     const result = resRows[0] || null;
-    if (result) result.services = svcRows;
+    if (result) {
+      result.services = svcRows;
+      result.combos = comboRows;
+    }
     return result;
   } catch (e) {
     await conn.rollback();
@@ -200,15 +172,8 @@ export const createReservationTx = async ({
 };
 
 /* ============================
-   Reads / Listings / Updates
+   Lecturas / Updates
 ============================ */
-
-/**
- * Retrieves a reservation by ID, including related services and joined user/role data.
- *
- * @param {number} id - Reservation ID
- * @returns {Promise<object|null>} Reservation with details or null if not found
- */
 export const getReservationById = async (id) => {
   const [rows] = await pool.query(
     `SELECT r.*,
@@ -231,30 +196,30 @@ export const getReservationById = async (id) => {
       WHERE rs.reservation_id = ?`,
     [id]
   );
+  const [combos] = await pool.query(
+    `SELECT c.id, c.name, c.price, c.discount_percent, c.duration_override
+       FROM reservation_combo rc
+       JOIN combos c ON c.id = rc.combo_id
+      WHERE rc.reservation_id = ?`,
+    [id]
+  );
+  for (const c of combos) {
+    const [items] = await pool.query(
+      `SELECT s.id AS service_id, s.name, s.price, s.duration, cs.quantity
+         FROM combo_services cs
+         JOIN services s ON s.id = cs.service_id
+        WHERE cs.combo_id = ?`,
+      [c.id]
+    );
+    c.items = items;
+  }
+
   rows[0].services = services;
+  rows[0].combos = combos;
   return rows[0];
 };
 
-/**
- * Lists reservations filtered by barber, client, status, or date range.
- *
- * @param {object} filters - Query filters
- * @param {number} [filters.barber_id] - Barber ID
- * @param {number} [filters.client_id] - Client ID
- * @param {number} [filters.status_id] - Reservation status ID
- * @param {Date|string} [filters.from] - Start date filter (inclusive)
- * @param {Date|string} [filters.to] - End date filter (exclusive)
- * @param {number} [filters.limit=200] - Maximum number of rows to return
- * @returns {Promise<object[]>} Array of reservations
- */
-export const listReservations = async ({
-  barber_id,
-  client_id,
-  status_id,
-  from,
-  to,
-  limit = 200,
-}) => {
+export const listReservations = async ({ barber_id, client_id, status_id, from, to, limit = 200 }) => {
   const where = [];
   const params = [];
   if (barber_id) { where.push("r.barber_id = ?"); params.push(barber_id); }
@@ -281,13 +246,6 @@ export const listReservations = async ({
   return rows;
 };
 
-/**
- * Updates reservation status by ID and returns the updated record.
- *
- * @param {number} id - Reservation ID
- * @param {number} status_id - New status ID
- * @returns {Promise<object>} Updated reservation
- */
 export const updateReservationStatus = async (id, status_id) => {
   await pool.query(
     `UPDATE reservations SET status_id = ? WHERE id = ?`,
@@ -296,15 +254,6 @@ export const updateReservationStatus = async (id, status_id) => {
   return getReservationById(id);
 };
 
-/**
- * Retrieves all busy time ranges for a barber within a day (or custom range).
- * Useful for the frontend to block unavailable slots.
- *
- * @param {number} barber_id - Barber ID
- * @param {Date} dayStart - Start of the day
- * @param {Date} dayEnd - End of the day
- * @returns {Promise<Array<{start_at: Date, end_at: Date, status_id: number}>>}
- */
 export const getBarberBusyRanges = async (barber_id, dayStart, dayEnd) => {
   const [rows] = await pool.query(
     `SELECT start_at, end_at, status_id

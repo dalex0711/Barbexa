@@ -1,82 +1,79 @@
 import * as repo from "../repositories/reservations.repository.js";
+import { combosRepository as crepo } from "../repositories/combos.repository.js";
 import dayjs from "dayjs";
 
-/**
- * Creates a new reservation after validating business rules
- *
- * @param {object} payload - Reservation data
- * @param {number} payload.client_id - Client ID (optional if inferred from JWT)
- * @param {number} payload.barber_id - Barber ID
- * @param {number[]} payload.services - Array of service IDs
- * @param {string|Date} payload.start_at - Reservation start time (ISO string or Date)
- * @param {string} [payload.notes] - Optional notes
- * @param {number} [payload.userIdFromJwt] - User ID from authenticated token
- * @returns {Promise<object>} Newly created reservation with services included
- * @throws {Error} If validation fails or overlap is detected
- */
 export const createReservation = async ({
-  client_id, barber_id, services, start_at, notes, userIdFromJwt
+  client_id, barber_id, services = [], combos = [],
+  start_at, notes, userIdFromJwt
 }) => {
-  if (!client_id) client_id = userIdFromJwt; // Infer client_id from JWT if not provided
+  if (!client_id) client_id = userIdFromJwt;
 
-  if (!Array.isArray(services) || services.length === 0)
-    throw new Error("Debe indicar al menos un servicio");
+  // Debe tener al menos servicios o combos
+  if ((!services || services.length === 0) && (!combos || combos.length === 0)) {
+    throw new Error("Debe indicar al menos un servicio o combo");
+  }
 
-  await repo.assertServicesEnabled(services);           // Step 1: services enabled
-  await repo.assertBarberProvidesServices(barber_id, services); // Step 2: barber provides services
+  // Validar servicios
+  if (services.length) {
+    await repo.assertServicesEnabled(services);
+    await repo.assertBarberProvidesServices(barber_id, services);
+  }
 
-  const totalMin = await repo.getTotalServiceMinutes(services); // Step 3: calculate duration
+  // Validar combos
+  if (combos.length) {
+    await crepo.assertCombosEnabled(combos);
+    // (opcional) validar que el barbero ofrezca todos los servicios del combo
+  }
+
+  // Calcular duración
+  let totalMin = 0;
+  totalMin += await repo.getTotalServiceMinutes(services);
+
+  for (const comboId of combos) {
+    const combo = await crepo.getComboById(comboId);
+    const items = await crepo.getComboServices(comboId);
+
+    if (combo?.duration_override) {
+      const [hh, mm, ss] = combo.duration_override.split(":").map(Number);
+      totalMin += (hh * 60 + mm + Math.floor((ss || 0) / 60));
+    } else {
+      for (const it of items) {
+        const [hh, mm, ss] = String(it.duration).split(":").map(Number);
+        const mins = (hh * 60 + mm + Math.floor((ss || 0) / 60)) * (it.quantity || 1);
+        totalMin += mins;
+      }
+    }
+  }
+
   if (totalMin <= 0) throw new Error("Duración total inválida");
+
   const start = dayjs(start_at);
   const end = start.add(totalMin, "minute").toDate();
 
-  const hasOverlap = await repo.existsOverlap(barber_id, new Date(start_at), end); // Step 4: overlap check
-  if (hasOverlap) throw new Error("El barbero ya tiene una reserva en ese rango");
+  // Validar solapamiento
+  const overlap = await repo.existsOverlap(barber_id, new Date(start_at), end);
+  if (overlap) throw new Error("El barbero ya tiene una reserva en ese rango");
 
-  // Step 5: create reservation transactionally
-  const status_id = 1; // Default: PENDING
+  // Crear transacción con combos incluidos
   const reservation = await repo.createReservationTx({
-    status_id, client_id, barber_id, notes, start_at: new Date(start_at), end_at: end, services
+    status_id: 1,
+    client_id,
+    barber_id,
+    notes,
+    start_at: new Date(start_at),
+    end_at: end,
+    services,
+    combos
   });
 
   return reservation;
 };
 
-/**
- * Retrieves a reservation by its ID.
- *
- * @param {number} id - Reservation ID
- * @returns {Promise<object|null>} Reservation object or null if not found
- */
 export const getReservationById = (id) => repo.getReservationById(id);
-
-/**
- * Lists reservations using optional filters (client_id, barber_id, status_id, from, to, limit).
- *
- * @param {object} filters - Filter options
- * @returns {Promise<object[]>} Array of reservations
- */
 export const listReservations = (filters) => repo.listReservations(filters);
-
-/**
- * Updates the status of a reservation.
- *
- * @param {number} id - Reservation ID
- * @param {number} status_id - New status ID
- * @returns {Promise<object>} Updated reservation
- */
 export const updateReservationStatus = (id, status_id) =>
   repo.updateReservationStatus(id, status_id);
-
-/**
- * Retrieves occupied time ranges for a barber on a given date.
- * Useful for blocking unavailable slots on the frontend.
- *
- * @param {number} barber_id - Barber ID
- * @param {string} dateStr - Date in YYYY-MM-DD format
- * @returns {Promise<Array<{start_at: Date, end_at: Date, status_id: number}>>}
- */
-export const getBarberDayAvailability = async (barber_id, dateStr) => {
+export const getBarberDayAvailability = (barber_id, dateStr) => {
   const dayStart = dayjs(dateStr).startOf("day").toDate();
   const dayEnd   = dayjs(dateStr).endOf("day").toDate();
   return repo.getBarberBusyRanges(barber_id, dayStart, dayEnd);
