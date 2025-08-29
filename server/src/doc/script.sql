@@ -1,15 +1,17 @@
-
-
+/* --- Database Creation --- */
 CREATE DATABASE barbexa;
 USE barbexa;
 
-/* TABLAS DE CONFIGURACION BASICA */
+/* --- Roles catalog --- */
 CREATE TABLE rol (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     code_name VARCHAR(50) UNIQUE
 );
 
+/* --- Users --- 
+   Application users linked to roles.
+   Soft-delete handled with 'enabled'. */
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -20,55 +22,48 @@ CREATE TABLE users (
     FOREIGN KEY (rol_id) REFERENCES rol(id) ON DELETE RESTRICT
 );
 
-/* TABLAS DE SERVICIOS Y COMBOS */
+/* --- Services catalog --- 
+   Basic services offered by barbers. */
 CREATE TABLE services (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
-    duration TIME NOT NULL
+    duration TIME NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE combos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description VARCHAR(255),
-    price DECIMAL(10,2) NOT NULL,
-    duration TIME NOT NULL
-);
-
-CREATE TABLE combo_service (
-    id_combo INT NOT NULL,
-    id_service INT NOT NULL,
-    PRIMARY KEY (id_combo, id_service),
-    FOREIGN KEY (id_combo) REFERENCES combos(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_service) REFERENCES services(id) ON DELETE CASCADE
-);
-
-CREATE TABLE barber_combos (
-    barber_id INT NOT NULL,
-    combo_id INT NOT NULL,
-    PRIMARY KEY (barber_id, combo_id),
-    FOREIGN KEY (barber_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE
-);
-
-/* DISPONIBLIDAD DEL BARBERO*/
+/* --- Barber weekly availability --- 
+   Defines weekly schedule per barber. */
 CREATE TABLE barber_availability (
     id INT AUTO_INCREMENT PRIMARY KEY,
     barber_id INT NOT NULL,
-    day_of_week VARCHAR(15) NOT NULL, 
+    day_of_week VARCHAR(15) NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     FOREIGN KEY (barber_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-/* RESERVAS  */
+/* --- Barber ↔ Services relation --- 
+   Which services each barber provides. */
+CREATE TABLE barber_services (
+    barber_id INT NOT NULL,
+    service_id INT NOT NULL,
+    PRIMARY KEY (barber_id, service_id),
+    FOREIGN KEY (barber_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+);
+
+/* --- Reservation statuses --- 
+   Example: PENDING, CONFIRMED, CANCELED. */
 CREATE TABLE status_reservation (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 );
 
+/* --- Reservations (header) --- 
+   Main booking entity. 
+   start_at/end_at define occupied slot. */
 CREATE TABLE reservations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     status_id INT NOT NULL,
@@ -82,6 +77,8 @@ CREATE TABLE reservations (
     FOREIGN KEY (barber_id) REFERENCES users(id) ON DELETE RESTRICT
 );
 
+/* --- Reservation ↔ Services --- 
+   Services included in a reservation. */
 CREATE TABLE reservation_service (
     service_id INT NOT NULL,
     reservation_id INT NOT NULL,
@@ -90,22 +87,41 @@ CREATE TABLE reservation_service (
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE
 );
 
-CREATE TABLE reservation_combos (
-    reservation_id INT NOT NULL,
-    combo_id INT NOT NULL,
-    PRIMARY KEY (reservation_id, combo_id),
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
-    FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE
+/* --- Combos catalog --- 
+   Grouped offerings (bundled services). */
+CREATE TABLE combos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(80) NOT NULL,
+  description VARCHAR(255),
+  price DECIMAL(10,2) NULL,
+  discount_percent DECIMAL(5,2) NULL,
+  duration_override TIME NULL,
+  enabled BOOLEAN NOT NULL DEFAULT 1
 );
 
-/* HISTORIAL DE ESTADO DE RESERVAS */
-CREATE TABLE reservation_status_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reservation_id INT NOT NULL,
-    status_id INT NOT NULL,
-    changed_by INT NOT NULL,
-    changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
-    FOREIGN KEY (status_id) REFERENCES status_reservation(id) ON DELETE RESTRICT,
-    FOREIGN KEY (changed_by) REFERENCES users(id) ON DELETE RESTRICT
+/* --- Combos ↔ Services relation --- 
+   Defines which services are part of a combo. */
+CREATE TABLE combo_services (
+  combo_id INT NOT NULL,
+  service_id INT NOT NULL,
+  quantity TINYINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (combo_id, service_id),
+  FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE,
+  FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
+
+/* --- Reservation ↔ Combos --- 
+   Combos included in a reservation. */
+CREATE TABLE reservation_combo (
+  combo_id INT NOT NULL,
+  reservation_id INT NOT NULL,
+  PRIMARY KEY (combo_id, reservation_id),
+  FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE,
+  FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE
+);
+
+/* --- Helpful indexes --- 
+   Improve query performance. */
+CREATE INDEX idx_combo_enabled ON combos(enabled);
+CREATE INDEX idx_combo_services_combo ON combo_services(combo_id);
+CREATE INDEX idx_combo_services_service ON combo_services(service_id);
