@@ -19,15 +19,15 @@ export const pool = createPool({
  * - Attempts to acquire a connection from the pool.
  * - Logs success or error message accordingly.
  */
-async function testDatabaseConnection() {
-    try {
-        const connection = await pool.getConnection();
-        console.log('✅ Database connection successful');
-        connection.release();
-    } catch (error) {
-        console.error('❌ Error connecting to the database:', error.message);
-    }
-}
+// async function testDatabaseConnection() {
+//     try {
+//         const connection = await pool.getConnection();
+//         console.log('✅ Database connection successful');
+//         connection.release();
+//     } catch (error) {
+//         console.error('❌ Error connecting to the database:', error.message);
+//     }
+// }
 
-// Run connectivity test at startup
-testDatabaseConnection();
+// // Run connectivity test at startup
+// testDatabaseConnection();
