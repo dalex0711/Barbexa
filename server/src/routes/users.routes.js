@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getUsersCount, getBarberUser } from '../controllers/users.controller.js';
+import { getUsersCount, getBarberUser,getUsers } from '../controllers/users.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = Router();
@@ -17,5 +17,7 @@ router.get('/usersCount', authMiddleware, getUsersCount);
  * @access  Protected (requires authentication)
  */
 router.get('/barberUser', authMiddleware, getBarberUser);
+
+router.get('/users', getUsers);
 
 export default router;

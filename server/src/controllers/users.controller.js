@@ -34,3 +34,12 @@ export const getBarberUser = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+export const getUsers = async (req, res) => {
+    try {
+        const usersList = await users.getUsers();
+        res.status(200).json({ users: usersList });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};

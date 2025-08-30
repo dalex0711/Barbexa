@@ -19,3 +19,9 @@ export const getBarberUser = async () => {
     const barberUser = await userRepository.getBarberUser();
     return barberUser;
 }
+
+
+export const getUsers = async () => {
+    const users = await userRepository.getUsers();
+    return users;
+}

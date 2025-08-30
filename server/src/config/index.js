@@ -20,7 +20,7 @@ export const config = {
     port: process.env.DB_PORT || 3306,
   },
   jwt: {
-    secret: process.env.JWT_SECRET || "default_secret",
-    expires: process.env.JWT_EXPIRES || "1h",
+    secret: process.env.JWT_SECRET,
+    expires: process.env.JWT_EXPIRES,
   },
 };
