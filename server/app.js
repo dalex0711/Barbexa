@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());       // Parse incoming JSON payloads
 app.use(cookieParser());       // Parse cookies for authentication/session handling
 app.use(cors({
-    origin: 'https://localhost:5173', // URL de tu frontend
+    origin: 'http://localhost:5173', // URL de tu frontend
     credentials: true, // Muy importante para cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
