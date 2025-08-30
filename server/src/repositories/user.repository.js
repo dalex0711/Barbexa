@@ -27,5 +27,13 @@ export const userRepository = {
             WHERE r.code_name = 'BARBER_02';
         `);
         return rows;
+    },
+
+    getUsers: async () => {
+        const [rows] = await pool.query(`
+            SELECT u.username
+            FROM users u
+        `);
+        return rows;
     }
 };
