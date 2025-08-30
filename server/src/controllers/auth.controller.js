@@ -32,11 +32,11 @@ export const login = async (req, res) => {
         const { user, token } = await authService.loginUser(email, password);
 
         // Store JWT in a secure HTTP-only cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false, // set true in production (HTTPS)
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 1000 // 1 hour
+       res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,        
+        sameSite: 'none',    
+        maxAge: 60 * 60 * 1000
         });
 
         res.json({ message: 'Login successful' });
