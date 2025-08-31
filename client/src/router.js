@@ -1,41 +1,49 @@
-
+// src/router.js
 import { getLoggedUser } from './services/auth.js';
 
-const routes = {
-  '/'         : '/src/views/landing.html',
-  '/login'    : '/src/views/login.html',
-  '/register' : '/src/views/register.html',
-  '/client'   : '/src/views/client.html',
-  '/barbers'  : '/src/views/barbers.html',
-  '/admin'    : '/src/views/admin.html',
-  '/404'      : '/src/views/404.html',
+// 1) En vez de rutas -> archivos, mapea rutas -> nombre lógico de la vista
+const routeViews = {
+  '/': 'landing',
+  '/login': 'login',
+  '/register': 'register',
+  '/client': 'client',
+  '/barbers': 'barbers',
+  '/admin': 'admin',
+  '/404': '404',
 };
 
-const controllers = {
-  '/'         : '/src/controllers/landing.js',
-  '/login'    : '/src/controllers/login.js',
-  '/register' : '/src/controllers/register.js',
-  '/client'   : '/src/controllers/client.js',
-  '/barbers'  : '/src/controllers/barbers.js',
-  '/admin'    : '/src/controllers/admin.js',
-  '/404'      : '/src/controllers/404.js',
+// 2) Igual para controladores
+const routeControllers = {
+  '/': 'landing',
+  '/login': 'login',
+  '/register': 'register',
+  '/client': 'client',
+  '/barbers': 'barbers',
+  '/admin': 'admin',
+  '/404': '404',
 };
 
 const app = document.getElementById('app');
+
+// === IMPORTS VITE ===
+// Vistas: las cargamos como string (HTML) para inyectarlas en el DOM
+const views = import.meta.glob('./views/*.html', { as: 'raw', eager: true });
+// Controladores: función que importa on-demand el módulo JS
+const controllers = import.meta.glob('./controllers/*.js'); // no eager
 
 // ===== Helpers =====
 function normalizePath(pathname) {
   try {
     const url = new URL(pathname, location.origin);
     const p = url.pathname.replace(/\/+$/, '') || '/';
-    return routes[p] ? p : '/404';
+    return routeViews[p] ? p : '/404';
   } catch {
     return '/404';
   }
 }
 
 function roleHome(user) {
-  const r = user?.code_name; // por si tu API usa 'rol'
+  const r = user?.code_name;
   if (r === 'ADMIN_01') return '/admin';
   if (r === 'BARBER_02') return '/barbers';
   if (r === 'CLIENT_03') return '/client';
@@ -44,25 +52,24 @@ function roleHome(user) {
 
 // Guards: retornan true si pueden entrar
 const guards = {
-  '/login'   : (user) => !user,                 // solo no logueados
-  '/register': (user) => !user,                 // solo no logueados
-  '/client'  : (user) => user?.code_name === 'CLIENT_03',             // cualquiera logueado
+  '/login'   : (user) => !user,
+  '/register': (user) => !user,
+  '/client'  : (user) => user?.code_name === 'CLIENT_03',
   '/barbers' : (user) => user?.code_name === 'BARBER_02',
   '/admin'   : (user) => user?.code_name === 'ADMIN_01',
   // landing sin guard
 };
 
-// Caché simple en memoria para evitar /profile en cada click inmediato
+// Caché simple
 let currentUser = null;
 let userFetchedOnce = false;
 let pendingNav = null;
 
 async function ensureUser() {
-  // Si ya lo pedimos una vez, usamos la última referencia
-  // (tu decide si quieres refetch siempre)
   if (userFetchedOnce && currentUser !== null) return currentUser;
   try {
-    currentUser = await getLoggedUser(); 
+    // IMPORTANTE: que getLoggedUser haga fetch con { credentials: 'include' }
+    currentUser = await getLoggedUser();
     console.log('Current user:', currentUser);
     userFetchedOnce = true;
   } catch {
@@ -76,42 +83,38 @@ async function resolveAccess(path) {
   const normalized = normalizePath(path);
   const guard = guards[normalized];
 
-  // Rutas públicas sin guard
   if (!guard) return { route: normalized, user: currentUser };
 
   const user = await ensureUser();
 
-  // Si no pasa el guard
   if (!guard(user)) {
-    // Si quiso ir a login/register pero ya está logueado → mandamos a su home por rol
     if ((normalized === '/login' || normalized === '/register') && user) {
       return { route: roleHome(user), user };
     }
-    // Si no está logueado → a /login
     if (!user) {
       return { route: '/login', user: null };
     }
-    // Está logueado pero sin permisos → 404 (o podrías usar /client)
     return { route: '/404', user };
   }
-
-  // Acceso permitido
   return { route: normalized, user: currentUser };
 }
 
+// === NUEVO: cargar vista desde imports (sin fetch a /src/...) ===
 export async function loadView(path) {
   const normalized = normalizePath(path);
-  const viewUrl = routes[normalized] || routes['/404'];
+  const viewName = routeViews[normalized] || '404';
+  const key = `./views/${viewName}.html`;
+  const html = views[key];
 
   try {
-    const res = await fetch(viewUrl, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    app.innerHTML = await res.text();
+    if (!html) throw new Error(`View not found: ${key}`);
+    app.innerHTML = html;
 
-    const ctlrPath = controllers[normalized];
-    if (ctlrPath) {
-      const module = await import(/* @vite-ignore */ ctlrPath);
-      if (module?.init) module.init();
+    const ctlrName = routeControllers[normalized];
+    const ctlrKey = ctlrName ? `./controllers/${ctlrName}.js` : null;
+    if (ctlrKey && controllers[ctlrKey]) {
+      const module = await controllers[ctlrKey]();
+      module?.init?.();
     }
   } catch (err) {
     console.error('loadView error:', err);
@@ -120,9 +123,8 @@ export async function loadView(path) {
 }
 
 export async function navigation(path) {
-  // Evita colisiones si se hacen clics rápidos
   if (pendingNav) {
-    try { await pendingNav; } catch { /* ignore */ }
+    try { await pendingNav; } catch {}
   }
   const navPromise = (async () => {
     const wanted = normalizePath(path);
@@ -135,21 +137,15 @@ export async function navigation(path) {
   })();
 
   pendingNav = navPromise;
-  try {
-    await navPromise;
-  } finally {
-    pendingNav = null;
-  }
+  try { await navPromise; } finally { pendingNav = null; }
 }
 
-// Back/forward del navegador
 window.addEventListener('popstate', async () => {
   const wanted = location.pathname;
   const { route } = await resolveAccess(wanted);
   await loadView(route);
 });
 
-// Intercepta enlaces internos y <a data-link>
 export function navigationTag() {
   document.addEventListener('click', async (e) => {
     const a = e.target.closest('a');
@@ -167,8 +163,7 @@ export function navigationTag() {
   });
 }
 
-// Inicial: intenta resolver acceso y cargar vista correcta
 export async function bootRouter() {
-  await ensureUser();            // llena currentUser si ya hay cookie
+  await ensureUser();
   await navigation(location.pathname);
 }
