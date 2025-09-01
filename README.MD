@@ -1,33 +1,51 @@
-🪈 Barbexa — Plataforma de Gestión para Barberías
+🪈 Barbexa — Barbershop Management Platform
 
-Barbexa es una plataforma full-stack para gestionar usuarios, barberos, servicios y reservas, con un frontend interactivo y un backend robusto.
+Barbexa is a full-stack platform to manage users, barbers, services, and bookings, featuring an interactive frontend and a robust backend.
 
-🧭 Tabla de Contenidos
+🧭 Table of Contents
 
-Tecnologías
-Arquitectura
-Estructura del Proyecto
-Características Principales
-Instalación y Configuración
-Scripts Disponibles
-API (Resumen)
-Buenas Prácticas Implementadas
+Technologies
+
+Architecture
+
+Project Structure
+
+Key Features
+
+Installation & Setup
+
+Available Scripts
+
+API (Summary)
+
+Best Practices Implemented
+
 Roadmap
-Contribución
-Licencia
 
-🧰 Tecnologías
+Contributing
+
+License
+
+🧰 Technologies
 Frontend
-JavaScript (ES6+), HTML5 semántico, CSS3 (Flexbox & Grid)
-Vite como bundler
-UI dinámica: catálogos, filtros, pestañas, formularios con validación
-Backend
-Node.js + Express
-Rutas RESTful y middlewares
-JWT en cookies HttpOnly
-Conexión a base de datos: MySQL / PostgreSQL / MongoDB
 
-🏗 Arquitectura
+JavaScript (ES6+), Semantic HTML5, CSS3 (Flexbox & Grid)
+
+Vite as bundler
+
+Dynamic UI: catalogs, filters, tabs, and validated forms
+
+Backend
+
+Node.js + Express
+
+RESTful routes & middlewares
+
+JWT in HttpOnly cookies
+
+Database connection: MySQL / PostgreSQL / MongoDB
+
+🏗 Architecture
 ```text
 Cliente (Vite, JS, HTML, CSS)
         │  fetch (HTTP)
@@ -37,7 +55,7 @@ Backend (Express + Middlewares)
         ▼
 Base de Datos (MySQL / PostgreSQL / MongoDB)
 
-📁 Estructura del Proyecto
+📁 Project estructure
 ```text
 Barbexa/
 ├─ client/                  # Frontend
@@ -64,35 +82,33 @@ Barbexa/
    ├─ package.json
    └─ README.md
 
-✨ Características Principales
+✨ Key Features
 
-Autenticación y Sesión: Login, JWT HttpOnly, logout seguro
+Authentication & Session: Login, JWT HttpOnly, secure logout
 
-Servicios: Catálogo, búsqueda y filtrado, cálculo automático
+Services: Catalog, search & filtering, automatic total calculation
 
-Barberos: Listado y selección en reservas
+Barbers: Listing and selection in bookings
 
-Reservas: Formulario completo, validaciones, tabla de reservas, cancelaciones, filtros
+Bookings: Full form, validations, bookings table, cancellations, filters
 
-Interactividad UI: Navbar, menú hamburguesa, pestañas dinámicas, actualización de totales
+UI Interactivity: Navbar, hamburger menu, dynamic tabs, live totals
 
-⚙ Instalación y Configuración
-Requisitos
+⚙ Installation & Setup
+Requirements
 
 Node.js v18+
 
-npm o yarn
+npm or yarn
 
-Base de datos MySQL (recomendado)
-
-
+MySQL database (recommended)
 
 1️⃣ Backend
 cd server
 npm install
 
 
-Crea un archivo .env basado en .env.example:
+Create a .env file based on .env.example:
 
 # General
 PORT=3000
@@ -109,15 +125,12 @@ JWT_SECRET=my_super_secret_key
 JWT_EXPIRES=1h
 
 
-Levanta el backend en modo desarrollo:
+Start the backend in development:
 
 npm run dev
 
 
-El servidor se iniciará por defecto en http://localhost:3000.
-
-
-
+The server will start by default at http://localhost:3000.
 
 2️⃣ Frontend
 cd ../client
@@ -125,112 +138,105 @@ npm install
 npm run dev
 
 
-Abre en tu navegador la URL que indique Vite (por defecto http://localhost:5173).
+Open in your browser the URL shown by Vite (default http://localhost:5173).
 
-
-
-🧪 Scripts Disponibles
-
+🧪 Available Scripts
 Frontend (client/package.json)
 
-Comando	Descripción
-dev	Levanta Vite en desarrollo
-build	Build de producción
-preview	Previsualizar build
+dev — Run Vite in development
+
+build — Production build
+
+preview — Preview production build
 
 Backend (server/package.json)
 
-Comando	Descripción
-dev	Levanta servidor con nodemon
-start	Levanta servidor con Node
-🔗 API (Resumen)
+dev — Start server with nodemon
 
-Prefijo base: http://localhost:3000
+start — Start server with Node
 
+🔗 API (Summary)
 
-
+Base URL: http://localhost:3000
 
 Auth
 
-POST /login — Iniciar sesión
+POST /login — Sign in
 
-POST /register — Registrar usuario
+POST /register — Register user
 
-GET /profile — Perfil de usuario autenticado
+GET /profile — Authenticated user profile
 
-POST /logout — Cerrar sesión
+POST /logout — Sign out
 
-Usuarios
+Users
 
-GET /usersCount — Total de usuarios
+GET /usersCount — Total users
 
-GET /barberUser — Listado de barberos
+GET /barberUser — Barbers list
 
-GET /users — Listado de usuarios
+GET /users — Users list
 
-Servicios
+Services
 
-GET /services — Listado
+GET /services — List
 
-POST /services — Crear (Admin)
+POST /services — Create (Admin)
 
-PUT /services/:id — Actualizar (Admin)
+PUT /services/:id — Update (Admin)
 
-DELETE /services/:id — Eliminar (Admin)
+DELETE /services/:id — Delete (Admin)
 
-POST /barbers/:barberId/services — Asignar servicios (Admin)
+POST /barbers/:barberId/services — Assign services (Admin)
 
-Reservas
+Bookings
 
-POST /reservations — Crear reserva
+POST /reservations — Create booking
 
-GET /reservations — Listar
+GET /reservations — List bookings
 
-GET /reservations/detail/:id — Detalle
+GET /reservations/detail/:id — Booking details
 
-PUT /reservations/:id/cancel — Cancelar reserva
+PUT /reservations/:id/cancel — Cancel booking
 
+✅ Best Practices Implemented
 
+async/await for async flows
 
+Error handling with try/catch
 
-✅ Buenas Prácticas Implementadas
+Form validation before HTTP calls
 
-async/await para asincronía
+Debounce in search inputs
 
-Manejo de errores con try/catch
+Safe DOM utilities: $, $$, esc
 
-Validación de formularios antes de llamadas HTTP
+Clear separation of concerns (UI, auth, HTTP wrapper)
 
-Debounce en inputs de búsqueda
-
-Utilidades seguras para DOM: $, $$, esc
-
-Separación de responsabilidades (UI, auth, HTTP wrapper)
-
-Estructura modular y escalable
+Modular and scalable structure
 
 🗺 Roadmap
 
-Disponibilidad en tiempo real por barbero
+Real-time availability per barber
 
-Panel Admin completo
+Full Admin panel
 
-Notificaciones (email / push)
+Notifications (email / push)
 
-UI/UX mobile-first mejorada
+Improved mobile-first UI/UX
 
 OAuth (Google/Facebook)
 
-Historial y estadísticas de reservas
+Booking history & statistics
 
-🤝 Contribución
-git checkout -b feature/nombre-feature
-git commit -m "feat: agrega nueva funcionalidad X"
-git push origin feature/nombre-feature
+🤝 Contributing
+git checkout -b feature/your-feature-name
+git commit -m "feat: add new feature X"
+git push origin feature/your-feature-name
 
 
-Luego abre un Pull Request explicando tus cambios.
+Then open a Pull Request describing your changes.
 
-📄 Licencia
+📄 License
 
-MIT License — Libre uso, modificación y distribución con atribución.
+MIT License — Free use, modification, and distribution with attribution.
