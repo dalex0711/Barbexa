@@ -17,7 +17,8 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://barbexa.netlify.app"
+      "https://barbexa.netlify.app",
+      "https://barbexa1.netlify.app/"
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
