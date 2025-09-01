@@ -21,11 +21,14 @@ export async function getLoggedUser() {
   }
 }
 
+
+
 /**
  * Logout the user by clearing the JWT cookie in the backend.
  * 
  * @returns {Promise<object>} Returns { message: "logout successfully" }
  */
-export async function logoutUser() {
-  return apiRequest("POST", ENDPOINTS.logout, {});
+export async function logoutUser(opts = {}) {
+  // credentials: 'include' ya está en apiRequest; acá solo pasamos keepalive si vino
+  return apiRequest("POST", ENDPOINTS.logout, {}, opts);
 }

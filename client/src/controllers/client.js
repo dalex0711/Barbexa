@@ -1,6 +1,6 @@
 // /src/controllers/client.js
 import { apiRequest } from "../api/request.js";
-import { getLoggedUser } from "../services/auth.js";
+import { getLoggedUser, logoutUser } from "../services/auth.js";
 
 const $  = (s, c=document) => c.querySelector(s);
 const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
@@ -31,12 +31,23 @@ export async function init(){
   });
 
   // ===== Logout =====
-  $("#btnLogout")?.addEventListener("click", async ()=>{
-    try{ await apiRequest("POST","/logout",{}); }catch{}
-    localStorage.clear(); sessionStorage.clear();
-    window.location.href="/login";
-  });
+$("#btnLogout")?.addEventListener("click", async () => {
+  const btn = $("#btnLogout");
+  btn.disabled = true;
 
+  try {
+    // Usa el helper centralizado y espera a que termine
+    await logoutUser({ keepalive: true });      // <- importante
+  } catch (_) {
+    // ignoramos; igual limpiamos cliente
+  }
+
+  // Limpia storage del cliente
+  try { localStorage.clear(); sessionStorage.clear(); } catch {}
+
+  // Evita que el navegador cancele la petición
+  window.location.replace("/login");
+});
   // ===== Logged client =====
   let CLIENT_ID = null;
   try{

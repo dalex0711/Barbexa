@@ -122,13 +122,24 @@ h3 { font-size: var(--fs-h3); margin: 15px 0; }
   border-radius: 10px;
   overflow: hidden;
   transition: opacity .25s ease, visibility .25s ease;
-  opacity: 0;
-  visibility: hidden;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+}
+
+#mainNav[hidden] {
+  display: none !important;
+}
+.nav-collapsible.active {
+  display: block;
+  opacity: 1;
+  visibility: visible;
 }
 
 .nav-collapsible.open {
   opacity: 1;
   visibility: visible;
+  
 }
 
 .nav-collapsible > ul {
@@ -368,7 +379,7 @@ footer p {
   z-index: 1200;
 
   /* Imagen como fondo */
-  background-image: url("../../assets/img/chatbots.png");
+  background-image: url("../img/ChatGPT\ Image\ 30\ ago\ 2025\,\ 06_06_11\ p.m..png");
   background-size: contain;    /* 🔥 se ajusta al ancho/alto sin deformar */
   background-repeat: no-repeat;
   background-position: center;
@@ -407,11 +418,27 @@ footer p {
   background: #1c1c1c;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  display: flex;
+  display: none;
   flex-direction: column;
   z-index: 1200; /* más alto que el botón */
 }
+.chatbot-show {
+  display: flex; /* o grid, o block, según tu diseño */
+  flex-direction: column;
+  /* otros estilos necesarios para mostrar el chat */
+}
 
+.chatbot-hide {
+  animation: fadeOut 0.3s forwards;
+}
+
+/* ejemplo de animación opcional */
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
 
 /* header */
 .chatbot-header{
@@ -508,4 +535,30 @@ footer p {
   50%  { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
+
+/* Ajuste hero-buttons para que los botones no se superpongan */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap; /* permite que los botones bajen de línea si no caben */
+}
+
+/* Tamaño de botones más pequeño en pantallas pequeñas */
+@media (max-width: 576px) {
+  .hero-buttons .btn-primary,
+  .hero-buttons .btn-secondary {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    width: 90%; /* ocupan todo el ancho disponible */
+    text-align: center;
+  }
+
+  .hero-buttons {
+    flex-direction: column; /* uno debajo del otro */
+    gap: 10px;
+    align-items: center;
+  }
+}
+
 

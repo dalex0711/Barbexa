@@ -1,5 +1,3 @@
-
-document.addEventListener("DOMContentLoaded", () => {
   // --- Elementos ---
   const chatbotToggle = document.querySelector('.chatbot-toggle');
   const chatbotBox = document.querySelector('.chatbot-box');
@@ -9,13 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const messagesEl = document.querySelector('.chatbot-messages');
   const optionsEl = document.querySelector('.chatbot-options');
   const voiceBtn = document.querySelector('.chatbot-voice');
-  
 
   // --- NAVBAR (menú hamburguesa) ---
   const menuToggle = document.querySelector('.menu-toggle');
   const mainNav = document.querySelector('#mainNav');
 
-  // toggle menú hamburguesa
+  // Toggle menú hamburguesa
   if (menuToggle && mainNav) {
     menuToggle.addEventListener("click", () => {
       const expanded = menuToggle.getAttribute("aria-expanded") === "true";
@@ -24,26 +21,62 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Manejar enlaces del menú
+  const navLinks = mainNav.querySelectorAll('a');
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+
+      // Enlaces internos (scroll)
+      if (href.startsWith('#')) {
+        e.preventDefault(); 
+        const targetId = href.substring(1);
+        const targetSection = document.getElementById(targetId);
+
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      // Cerrar menú solo si es pantalla pequeña (hamburguesa visible)
+      if (window.getComputedStyle(menuToggle).display !== 'none') {
+        mainNav.hidden = true;
+        menuToggle.setAttribute("aria-expanded", false);
+      }
+    });
+  });
+
+  // Opcional: manejar resize para mostrar siempre menú en pantalla grande
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) { // ejemplo breakpoint
+      mainNav.hidden = false;
+      menuToggle.setAttribute("aria-expanded", false);
+    } else {
+      mainNav.hidden = true;
+    }
+  });
+
   let waitingForFaceType = false;
   let awaitingBooking = false;
   let recognition; // speech recognition instance (if supported)
 
   // --- Quick options ---
   const quickOptions = [
-    { text: "Recomendación de corte", value: "corte" },
-    { text: "Ver precios", value: "precios" },
-    { text: "Horarios", value: "horarios" },
-    { text: "Ubicación", value: "ubicacion" },
-    { text: "Tips de cuidado", value: "tips" },
-    { text: "Agendar cita", value: "cita" }
+    { text: "Haircut recommendation", value: "corte" },
+    { text: "View prices", value: "precios" },
+    { text: "Opening hours", value: "horarios" },
+    { text: "Location", value: "ubicacion" },
+    { text: "Hair care tips", value: "tips" },
+    { text: "Book appointment", value: "cita" }
   ];
 
   // --- Example images for haircuts ---
   const haircutImages = {
-    pompadour: ["/assets/img/cortes/pompadour1.jpg","/assets/img/cortes/pompadour2.jpg"],
-    fade: ["/assets/img/cortes/fade1.jpg","/assets/img/cortes/fade2.jpg"],
-    quiff: ["/assets/img/cortes/quiff1.jpg"],
-    buzz: ["/assets/img/cortes/buzz1.jpg"]
+    pompadour: ["../../public/assets/img/cote.webp"],
+    fade: ["../../public/assets/img/cote.webp"],
+    quiff: ["../../public/assets/img/cote.webp"],
+    buzz: ["../../public/assets/img/cote.webp"]
   };
 
   // --- Utilities: persist chat history ---
@@ -60,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const history = JSON.parse(localStorage.getItem(CHAT_KEY) || "[]");
       history.forEach(msg => appendMessage(msg.text, msg.sender, false));
     } catch (e) {
-      console.error("Error cargando historial del chat:", e);
+      console.error("Error loading chat history:", e);
     }
   }
 
@@ -94,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     optionsEl.setAttribute("hidden", "");
 
     if(value === "corte"){
-      appendMessage("¡Genial! 😊 Cuéntame, ¿cómo describirías tu rostro? (redondo, cuadrado, alargado, ovalado)", "bot");
+      appendMessage("Great! 😊 Tell me, how would you describe your face? (round, square, long, oval)", "bot");
       waitingForFaceType = true;
     } 
     else if(value === "tips"){
@@ -102,8 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(showOptions,700);
     } 
     else if(value === "cita"){
-      appendMessage("Perfecto 👍 te llevaré al login para que agendes tu cita.", "bot");
-      setTimeout(()=> window.location.href="/views/login.html",1500);
+      appendMessage("Perfect 👍 I will take you to the login page to book your appointment.", "bot");
+      setTimeout(()=> window.location.href="/login",1500);
     }
     else {
       appendMessage(getBotReply(value), "bot");
@@ -114,29 +147,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Bot replies ---
   function getBotReply(value){
-    if(value === "precios") return "Nuestros precios: Corte desde <strong>$20.000</strong> | Barba <strong>$15.000</strong> | Paquete completo <strong>$30.000</strong>.";
-    if(value === "horarios") return "⏰ Abrimos L - S: 9:00 AM - 9:00 PM. ¿Quieres agendar una cita rápida?";
-    if(value === "ubicacion") return "📍 Estamos en Cra. 15 #45-20, Barranquilla. ¿Deseas que te envíe indicaciones o agendemos?";
-    return "Lo siento, no entendí tu mensaje.";
+    if(value === "precios") return "Our prices: Haircut from <strong>$20.000</strong> | Beard <strong>$15.000</strong> | Full package <strong>$30.000</strong>.";
+    if(value === "horarios") return "⏰ We are open Mon - Sat: 9:00 AM - 9:00 PM. Want to quickly book an appointment? Choose the <strong>Book appointment</strong> option.";
+    if(value === "ubicacion") return "📍 We are at Cra. 15 #45-20, downtown Barranquilla. For more info, contact the WhatsApp at the bottom.";
+    return "Sorry, I didn't understand your message.";
   }
 
   // --- Haircut recommendation ---
   function getHaircutRecommendation(faceType){
     const f = faceType.toLowerCase();
-    if(f.includes("redondo")) return { text:"😀 Para rostro redondo: volumen arriba y lados cortos — Pompadour o Fade alto.", images: haircutImages.pompadour };
-    if(f.includes("cuadrado")) return { text:"💪 Rostro cuadrado: textura arriba — Crew Cut o Undercut.", images: haircutImages.fade };
-    if(f.includes("alargado")) return { text:"👌 Rostro alargado: volumen a los lados — Fringe o Corte clásico.", images: haircutImages.quiff };
-    if(f.includes("ovalado")) return { text:"🔥 Rostro ovalado: te queda casi cualquier corte. Prueba Buzz o Quiff.", images: haircutImages.buzz };
-    return { text:"🤔 No reconozco ese tipo de rostro. Intenta: redondo, cuadrado, alargado u ovalado.", images: [] };
+    if(f.includes("round")) return { text:"😀 For round face: volume on top and short sides — Pompadour or High Fade.", images: haircutImages.pompadour };
+    if(f.includes("square")) return { text:"💪 Square face: texture on top — Crew Cut or Undercut.", images: haircutImages.fade };
+    if(f.includes("long")) return { text:"👌 Long face: volume on the sides — Fringe or Classic cut.", images: haircutImages.quiff };
+    if(f.includes("oval")) return { text:"🔥 Oval face: almost any haircut suits you. Try Buzz or Quiff.", images: haircutImages.buzz };
+    return { text:"🤔 I don't recognize that face type. Try: round, square, long, or oval.", images: [] };
   }
 
   // --- User text ---
   function handleUserText(text){
     appendMessage(text, "user");
 
-    if(/cita|agendar/i.test(text)){ // 🔹 Detectar cita directa
-      appendMessage("Perfecto 👍 te llevaré al login para que agendes tu cita.", "bot");
-      setTimeout(()=> window.location.href="../views/login.html",1500);
+    // chatbot detecta cita
+    if(/cita|agendar/i.test(text)){
+      appendMessage("Perfect 👍 I will take you to the login page to book your appointment.", "bot");
+      setTimeout(() => router.navigate('/login'), 1500); // tu función router
       return;
     }
 
@@ -148,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    appendMessage("🤖 Hola, Intenta seleccionar una de las opciones del menú o escribe 'cita' para agendar.", "bot");
+    appendMessage("🤖 Hello, try selecting one of the menu options or type 'appointment' to book.", "bot");
     setTimeout(showOptions, 700);
   }
 
@@ -158,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
     container.className = "chat-thumb";
     urls.forEach(u=>{
       const img = document.createElement("img");
-      img.src = u; img.alt="corte"; img.loading="lazy";
+      img.src = u; img.alt="haircut"; img.loading="lazy";
       img.addEventListener("click", ()=> openImageModal(u));
       container.appendChild(img);
     });
@@ -178,11 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Care tips ---
   function getCareTips(){
-    return `✨ <strong>Tips rápidos:</strong>
+    return `✨ <strong>Quick tips:</strong>
     <ul style="margin:6px 0 0 18px;color:#ddd">
-      <li>Lava tu cabello con shampoo suave 2-3 veces por semana.</li>
-      <li>Usa aceite para barba a diario si la tienes.</li>
-      <li>Recorta puntas cada 6-8 semanas para mantener la forma.</li>
+      <li>Wash your hair with mild shampoo 2-3 times per week.</li>
+      <li>Use beard oil daily if you have one.</li>
+      <li>Trim ends every 6-8 weeks to maintain shape.</li>
     </ul>`;
   }
 
@@ -193,41 +227,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const r = new SpeechRecognition();
     r.lang = 'es-CO'; r.interimResults=false; r.maxAlternatives=1;
     r.onresult=(e)=>{ const text=e.results[0][0].transcript; handleUserText(text); };
-    r.onerror=()=> appendMessage("No pude entender la voz, intenta escribir.", "bot");
+    r.onerror=()=> appendMessage("I couldn't understand the voice, try typing.", "bot");
     return r;
+  }
+
+  //--- limpiar chat
+  function clearChatHistory(){
+    localStorage.removeItem(CHAT_KEY);
+    messagesEl.innerHTML = "";
+    appendMessage("🧹 History cleared.", "bot");
+    showOptions();
   }
 
   // --- Abrir/cerrar chat ---
   function openChat() {
-    chatbotBox.hidden = false;
-    chatbotToggle.style.display = "none";
+    chatbotBox.style.display = "flex";
     chatbotBox.classList.remove("chatbot-hide");
     chatbotBox.classList.add("chatbot-show");
+    
+    chatbotToggle.style.display = "none"; // ocultar botón al abrir
+    chatbotBox.hidden = false;
 
-    // 👉 Si no hay historial, mostrar saludo inicial
     const history = JSON.parse(localStorage.getItem(CHAT_KEY) || "[]");
     if (history.length === 0) {
-      appendMessage("👋 Hola, soy tu asistente ALEX. ¿En qué puedo ayudarte hoy?", "bot");
+      appendMessage("👋 Hi, I'm your assistant ALEX. How can I help you today?", "bot");
       showOptions();
     } else {
       setTimeout(() => showOptions(), 400);
     }
   }
 
-  function closeChat(){
+  function closeChat() {
     chatbotBox.classList.remove("chatbot-show");
     chatbotBox.classList.add("chatbot-hide");
 
-    chatbotBox.addEventListener(
-      "animationend",
-      () => {
-        if (chatbotBox.classList.contains("chatbot-hide")) {
-          chatbotBox.hidden = true;
-          chatbotToggle.style.display = "grid";
-        }
-      },
-      { once: true }
-    );
+    setTimeout(() => {
+      chatbotBox.style.display = "none";
+      chatbotBox.hidden = true;
+      chatbotToggle.style.display = "block"; // volver a mostrar botón
+    }, 300);
+
+    // limpiar historial y mensajes
+    localStorage.removeItem(CHAT_KEY);
+    messagesEl.innerHTML = "";
   }
 
   // 👉 Botón flotante
@@ -259,11 +301,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- voice button ---
   if(voiceBtn){
     voiceBtn.addEventListener("click", ()=>{
-      if(!recognition){ recognition=initSpeechRecognition(); if(!recognition){ appendMessage("Tu navegador no soporta reconocimiento de voz.", "bot"); return; } }
-      try{ recognition.start(); appendMessage("🎤 Grabando... habla ahora.", "bot"); }catch(e){ appendMessage("No pude iniciar el micrófono.", "bot"); }
+      if(!recognition){ recognition=initSpeechRecognition(); if(!recognition){ appendMessage("Your browser doesn't support voice recognition.", "bot"); return; } }
+      try{ recognition.start(); appendMessage("🎤 Recording... speak now.", "bot"); }catch(e){ appendMessage("Couldn't start the microphone.", "bot"); }
     });
   }
 
   // --- Initial load ---
   loadHistory();
-});

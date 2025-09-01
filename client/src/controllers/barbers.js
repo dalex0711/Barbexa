@@ -1,6 +1,7 @@
 // /src/controllers/barbers.js
 import { apiRequest } from "../api/request.js";
-import { getLoggedUser } from "../services/auth.js";  // ✅ integrated
+import { getLoggedUser, logoutUser } from '../services/auth.js';
+
 
 export async function init(){
   const tbody        = document.querySelector("#reservationsTable tbody");
@@ -159,12 +160,44 @@ export async function init(){
   filterStatus?.addEventListener("change", applyFilter);
   btnReload?.addEventListener("click", loadReservations);
 
-  btnLogout?.addEventListener("click", async ()=>{
-    try { await apiRequest("POST", "/logout", {}); } catch {}
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/login";
+  btnLogout?.addEventListener("click", async () => {
+    console.log("Logging out...");
+    try {
+      await apiRequest("POST", "/logout", {});
+    } catch (e) {
+      console.error("Logout API failed:", e);
+    } finally {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/login"; // o "/login.html" según tu estructura
+    }
   });
+
+async function mostrarUsuario() {
+  const user = await getLoggedUser();
+  
+  if (user) {
+    console.log("Usuario logueado:", user);
+  } else {
+    console.log("No hay usuario logueado");
+  }
+}
+
+mostrarUsuario();
+
+
+async function cerrarSesion() {
+  try {
+    const res = await logoutUser();
+    console.log(res.message); // "logout successfully"
+  } catch (err) {
+    console.error("Error al cerrar sesión:", err);
+  }
+}
+
+cerrarSesion();
+
+
 
   // ====== First load ======
   loadReservations();
