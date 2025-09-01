@@ -14,11 +14,20 @@ const app = express();
 app.use(express.json());       // Parse incoming JSON payloads
 app.use(cookieParser());       // Parse cookies for authentication/session handling
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://barbexa.netlify.app'],
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://barbexa.netlify.app"
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 }));
+
 
 // API routes
 app.use(authRoutes);           // Authentication & authorization endpoints
