@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());       // Parse incoming JSON payloads
 app.use(cookieParser());       // Parse cookies for authentication/session handling
 app.use(cors({
-    origin: 'https://barbexa.netlify.app/', 
+    origin: ['http://localhost:5173', 'https://barbexa.netlify.app'],
     credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
