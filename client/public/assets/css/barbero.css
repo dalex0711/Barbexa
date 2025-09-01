@@ -1,0 +1,281 @@
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #111; /* Negro elegante */
+  color: #eee;
+  line-height: 1.6;
+}
+
+h1, h2 {
+  font-family: 'Playfair Display', serif;
+  margin: 0;
+  
+}
+
+/* ===== NAVBAR ===== */
+header {
+  background: #000;
+  border-bottom: 2px solid #f9c74f;
+  padding: 15px 30px;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav h1 {
+  color: #f9c74f;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav ul li a {
+  color: #eee;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+nav ul li a:hover {
+  color: #f9c74f;
+}
+#logo {
+  width: 60px;   /* Ajusta el ancho */
+  height: auto;   /* Mantiene proporción */
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h2 {
+  color: #f9c74f;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== BUTTONS ===== */
+button {
+  background: #f9c74f;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #fcdd31;
+  color: #fff;
+}
+
+/* ===== LISTS ===== */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background: #222;
+  margin: 5px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* ===== FORM INLINE ===== */
+.form-inline {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+/* ====== Table adjustments ====== */
+td.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Make select grow */
+td.actions-cell .statusSel {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Mobile responsive: stack select + button */
+@media (max-width: 600px) {
+  td.actions-cell {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  td.actions-cell .btnSaveStatus {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 6px;
+  }
+}
+/* ===== Navbar responsive ===== */
+.menu-btn{
+  display:none;
+  background:#222;
+  color:#eee;
+  border:1px solid #333;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer;
+}
+@media (max-width: 720px){
+  nav{
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .menu-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  /* menú oculto por defecto en móvil */
+  #mainMenu{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    gap:10px;
+    margin-top:10px;
+    background:#0f0f0f;
+    border:1px solid #2a2a2a;
+    border-radius:12px;
+    padding:12px;
+  }
+  #mainMenu.open{ display:flex; }
+  #mainMenu li{ width:100%; }
+  #mainMenu a, #mainMenu .btn{
+    width:100%;
+    display:inline-flex;
+    justify-content:flex-start;
+  }
+}
+/* ===== Tabla: contenedor con scroll ===== */
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  border:1px solid #333;
+  border-radius:12px;
+}
+
+/* ===== Card-table en móvil ===== */
+@media (max-width: 700px){
+  .table thead{
+    display:none;
+  }
+  .table,
+  .table tbody,
+  .table tr,
+  .table td{
+    display:block;
+    width:100%;
+  }
+  .table tr{
+    background:#141414;
+    border-bottom:1px solid #2a2a2a;
+    margin-bottom:10px;
+    border-radius:10px;
+    padding:8px 10px;
+  }
+  .table td{
+    border:none;
+    padding:8px 6px;
+  }
+  .table td::before{
+    content: attr(data-label);
+    display:block;
+    font-weight:700;
+    color:#f9c74f;
+    margin-bottom:2px;
+    font-size:.9rem;
+  }
+  /* Celda de acciones: apila select + botón */
+  td.actions-cell{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:stretch;
+  }
+  td.actions-cell .btnSaveStatus{
+    width:100%;
+    margin-left:0;
+  }
+}
+
+/* ===== Mejoras de la celda de acciones en desktop ===== */
+td.actions-cell{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+td.actions-cell .statusSel{
+  flex:1;
+  min-width:140px;
+}
+
+.table-tools{
+  display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap;
+}
+.input, .select{ padding:10px 12px; border-radius:8px; border:1px solid #333; background:#111; color:#eee; }
+.table{ width:100%; border-collapse:collapse; overflow:auto; }
+    .table th, .table td{ padding:12px; border-bottom:1px solid #333; text-align:left; }
+    .table th{ color:#f9c74f; font-weight:700; background:#141414; position:sticky; top:0; }
+    .status-pill{ padding:4px 10px; border-radius:999px; font-weight:700; font-size:.85rem; }
+    .st-PENDIENTE{ background:#3a2b00; color:#f6d365; }
+    .st-CONFIRMADA{ background:#073d2b; color:#4ade80; }
+    .st-COMPLETADA{ background:#0b2a43; color:#60a5fa; }
+    .st-CANCELADA{ background:#3a0c0c; color:#f87171; }
+    .muted{ color:#aaa; font-size:.9rem; }
+    .right{ margin-left:auto; }
+    .btn{ background:#f9c74f; color:#111; border:none; border-radius:8px; padding:10px 14px; font-weight:700; cursor:pointer; }
+    .btn:hover{ filter:brightness(1.05); }
+    .btn.danger{ background:#ef4444; color:#fff; }
+  

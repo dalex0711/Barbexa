@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Barber Panel - Barbexa</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/img/logo2.png">
+  <!-- Font Awesome icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/assets/css/barbero.css">
+
+</head>
+<body>
+  <!-- Header with navigation -->
+  <header>
+    <nav>
+      <h1><img id="logo" src="/assets/img/logo2.png" alt=""> BARBER</h1>
+
+      <!-- Mobile hamburger button -->
+      <button id="menuToggle" aria-label="Open menu" class="menu-btn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <!-- Main navigation menu -->
+      <ul id="mainMenu">
+        <li><a href="/" data-link><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="/barbers" data-link class="active"><i class="fa-solid fa-user-tie"></i> Panel</a></li>
+        <li><button id="btnLogout" class="btn danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main container -->
+  <div class="container">
+
+    <!-- Barber's schedule card -->
+    <div class="card" style="grid-column: 1 / -1;">
+      <h2><i class="fa-solid fa-calendar-days"></i> My Schedule</h2>
+
+      <!-- Table filters and tools -->
+      <div class="table-tools">
+        <!-- Filter by time -->
+        <div>
+          <label class="muted">Filter by time</label><br/>
+          <input id="filterTime" class="input" type="time" step="60" />
+        </div>
+
+        <!-- Filter by status -->
+        <div>
+          <label class="muted">Filter by status</label><br/>
+          <select id="filterStatus" class="select">
+            <option value="">All</option>
+            <option value="PENDIENTE">PENDING</option>
+            <option value="CONFIRMADA">CONFIRMED</option>
+            <option value="COMPLETADA">COMPLETED</option>
+            <option value="CANCELADA">CANCELLED</option>
+          </select>
+        </div>
+
+        <!-- Reload button -->
+        <button id="btnReload" class="btn right"><i class="fa-solid fa-rotate"></i> Reload</button>
+      </div>
+
+      <!-- Reservations table -->
+      <div class="table-wrap">
+        <table class="table" id="reservationsTable">
+          <thead>
+            <tr>
+              <th style="width:80px;">ID</th>
+              <th>Client</th>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Note</th>
+              <th>Status</th>
+              <th style="width:200px;">Change Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <!-- Message when no reservations -->
+        <div id="emptyMsg" class="muted" style="padding:8px 0; display:none;">No reservations found.</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

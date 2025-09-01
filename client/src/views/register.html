@@ -1,0 +1,65 @@
+<!-- app/pages/register.html -->
+
+  <!-- Link to your CSS -->
+  <link rel="stylesheet" href="../../public/assets/css/register.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <!-- Background -->
+  <div class="auth-bg"></div>
+
+  <!-- Main container -->
+  <div class="login-container">
+    <div class="login-form card">
+      <!-- Logo section -->
+      <div class="logo">
+        <img src="/assets/img/logo.png" alt="Barbexa Logo">
+      </div>
+
+      <!-- Divider with title -->
+      <div class="divider-text">
+        <span><h2 class="card-title">REGISTER</h2></span>
+      </div>
+
+      <!-- Registration form -->
+      <form id="registerForm" novalidate>
+        <!-- Full name input -->
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" required>
+          <small class="error"></small>
+        </div>
+
+        <!-- Email input -->
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="youremail@example.com" required>
+          <small class="error"></small>
+        </div>
+
+        <!-- Password input with toggle -->
+        <div class="field password-field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="••••••••" minlength="6" required>
+          <button class="toggle-pass" type="button" aria-label="Show/Hide password">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+          <small class="error"></small>
+        </div>
+
+        <!-- Terms and conditions checkbox -->
+        <div class="terms">
+          <label class="checkbox">
+            <input id="terms" type="checkbox" required>
+            <span>I accept <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.</span>
+          </label>
+          <small class="error" id="termsError"></small>
+        </div>
+
+        <!-- Main submit button -->
+        <button class="btn primary" type="submit">Create account</button>
+      </form>
+
+      <!-- Alternative link to login -->
+      <p class="small alt-link">You have an account? <a href="/login" data-link>Sign in</a></p>
+    </div>
+  </div>

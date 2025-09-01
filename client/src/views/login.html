@@ -1,0 +1,47 @@
+  <!-- Link to login page stylesheet -->
+  <link rel="stylesheet" href="../../public/assets/css/login.css">
+  <!-- Background -->
+  <div class="background"></div>
+
+  <!-- Login container -->
+  <div class="login-box">
+    <!-- Logo section -->
+    <div class="logo">
+      <img src="/assets/img/logo.png" alt="Barbexa Logo">
+    </div>
+
+    <!-- Divider with title -->
+    <div class="divider-text">
+      <span><h2 class="login-title">LOGIN</h2></span>
+    </div>
+
+    <!-- Login form -->
+    <form id="loginForm" novalidate>
+      <!-- Email input -->
+      <div class="input-group field">
+        <input id="email" type="email" placeholder="Email" name="email" required>
+        <small class="error"></small>
+      </div>
+
+      <!-- Password input -->
+      <div class="input-group field password-field">
+        <input id="password" type="password" placeholder="Password" name="password" required>
+        <small class="error"></small>
+      </div>
+
+      <!-- Options: remember me & password recovery -->
+      <div class="options">
+        <label><input type="checkbox" name="remember"> Remind me</label>
+        <a href="#">Forgot your password?</a>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn">Login</button>
+
+      <!-- Redirect link to register page -->
+      <p class="register-text">
+        Don't have an account yet? <a href="/register" data-link>Register</a>
+      </p>
+    </form>
+  </div>
+

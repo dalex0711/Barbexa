@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Barbexa · Client</title>
+
+  <link rel="icon" type="image/png" href="/assets/img/logo2.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/css/client.css">
+</head>
+<body>
+
+  <!-- ===== Navbar ===== -->
+  <header class="navbar" id="topNav">
+    <div class="logo glass">
+      <img src="/assets/img/logo2.png" alt="Barbexa">
+      <h1>Barbexa</h1>
+    </div>
+
+    <button id="menuToggle" aria-label="Open menu" class="menu-btn">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav>
+      <ul id="mainMenu" class="nav-tabs">
+        <li><a href="#" data-tab="services" class="tab-link active"><i class="fa-solid fa-list"></i> Services</a></li>
+        <li><a href="#" data-tab="book" class="tab-link"><i class="fa-solid fa-calendar-plus"></i> Book</a></li>
+        <li><a href="#" data-tab="appointments" class="tab-link"><i class="fa-solid fa-calendar-days"></i> My Appointments</a></li>
+        <li><button id="btnLogout" class="btn danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- ===== Services ===== -->
+    <section id="view-services" class="card">
+      <div class="section-head">
+        <h2 class="title"><i class="fa-solid fa-list"></i> Our Services</h2>
+        <div class="section-tools">
+          <input id="svcSearch" class="input" type="text" placeholder="Search services by name...">
+        </div>
+      </div>
+
+      <div id="servicesCatalog" class="services-catalog"></div>
+      <div id="servicesEmpty" class="empty muted" style="display:none;">No services found.</div>
+    </section>
+
+    <!-- ===== Book (sección independiente) ===== -->
+    <section id="view-book" class="card book-card" style="display:none;">
+      <div class="card-head">
+        <div class="title">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <h2>Book Appointment</h2>
+        </div>
+        <p class="subtitle">Pick a barber, select services and choose your date & time.</p>
+      </div>
+
+      <form id="formReservation" class="book-grid" novalidate>
+        <!-- Column 1: Who/When/Notes -->
+        <div class="book-left">
+          <div class="field">
+            <label for="barberSel">Select Barber</label>
+            <select id="barberSel" class="input" required>
+              <option value="">-- Choose a barber --</option>
+            </select>
+            <small class="error"></small>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="dateSel">Date</label>
+              <input id="dateSel" type="date" class="input" required />
+              <small class="error"></small>
+            </div>
+            <div class="field">
+              <label for="timeSel">Time</label>
+              <input id="timeSel" type="time" step="60" class="input" required />
+              <small class="error"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" class="input" rows="3" placeholder="Anything we should know?"></textarea>
+          </div>
+        </div>
+
+        <!-- Column 2: Services Picker -->
+        <div class="book-right">
+          <div class="label-row">
+            <label>Services</label>
+            <input id="svcPickerSearch" class="input small" type="text" placeholder="Search services...">
+          </div>
+
+          <div id="servicesGroup" class="services-picker cards"></div>
+          <small class="error" id="errServices"></small>
+        </div>
+
+        <!-- TOTAL & SUBMIT (AL FINAL) -->
+        <div class="book-footer">
+          <div class="total-line">
+            <span class="muted">Selected:</span> <strong id="svcCount">0</strong>
+            <span class="sep">|</span>
+            <span class="muted">Total:</span> <strong id="svcTotal">$0</strong>
+          </div>
+          <button type="submit" class="btn primary book-submit">
+            <i class="fa-solid fa-paper-plane"></i> Book
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== My Appointments ===== -->
+    <section id="view-appointments" class="card" style="display:none;">
+      <h2 class="title"><i class="fa-solid fa-calendar-days"></i> My Appointments</h2>
+
+      <div class="table-tools">
+        <div>
+          <label class="muted">Filter by date</label><br/>
+          <input id="filterDate" type="date" class="input">
+        </div>
+        <div>
+          <label class="muted">Filter by status</label><br/>
+          <select id="filterStatus" class="input">
+            <option value="">All</option>
+            <option value="PENDIENTE">PENDING</option>
+            <option value="CONFIRMADA">CONFIRMED</option>
+            <option value="COMPLETADA">COMPLETED</option>
+            <option value="CANCELADA">CANCELLED</option>
+          </select>
+        </div>
+        <button id="btnReloadList" class="btn right"><i class="fa-solid fa-rotate"></i> Reload</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" id="reservationsTable">
+          <thead>
+            <tr>
+              <th style="width:80px;">ID</th>
+              <th>Barber</th>
+              <th>Services</th>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+              <th style="width:170px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyMsg" class="muted" style="padding:8px 0; display:none;">No appointments found.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Controller -->
+  <script type="module" src="/src/controllers/client.js"></script>
+</body>
+</html>

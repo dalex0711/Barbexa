@@ -1,0 +1,250 @@
+/* ========= BASE & TOKENS ========= */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root{
+  --gold: #d4af37;
+  --gold-weak: rgba(212,175,55,0.25);
+  --text: #e8e8e8;
+  --text-soft: #cfcfcf;
+  --bg-card: rgba(10,10,10,0.7);
+  --stroke: #3a3a3a;
+  --field-bg: #0f0f0f;
+}
+
+/* ========= PÁGINA / FONDO ========= */
+.auth-page{
+  min-height: 100svh;      /* mejor en móviles con barra dinámica */
+  margin: 0;
+  color: var(--text);
+  background: center/cover no-repeat url(../assets/img/fondo_barberia.png);
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  /* tu font-weight original era 20 (no estándar). Usa 400 para normal: */
+  font-weight: 400;
+}
+
+/* Capa atenuadora (no tapa contenido) */
+.auth-bg{
+  position: fixed;
+  inset: 0;
+  background: url("../img/fondo_barberia.png") center/cover no-repeat;
+  filter: brightness(0.45);
+  z-index: -1;
+}
+
+/* ========= CONTENEDOR & CARD ========= */
+.login-container{
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+.card{
+  width: min(92vw, 520px);
+  background: var(--bg-card);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--gold-weak);
+  border-radius: 18px;
+  padding: clamp(20px, 4vw, 28px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+/* ========= ENCABEZADO ========= */
+.card-title{
+  text-align: center;
+  margin: 10px 0 18px;
+  letter-spacing: .5px;
+  color: #f0e6c8;
+  text-shadow: 0 0 12px rgba(212,175,55,.25);
+  font-size: clamp(1.1rem, 2.8vw, 1.35rem);
+}
+
+.logo img{
+  width: clamp(120px, 40vw, 160px);
+  height: auto;
+  display: block;
+  margin: 8px auto 0;
+}
+
+/* ========= BOTONES SOCIALES ========= */
+.social-group{
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn{
+  width: 100%;
+  border: 0;
+  padding: clamp(12px, 3.6vw, 14px);
+  border-radius: 10px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  background: #171717;
+  color: #eee;
+  cursor: pointer;
+  transition: filter .2s ease, transform .05s ease;
+  touch-action: manipulation;
+  font-size: clamp(.95rem, 2.8vw, 1rem);
+}
+
+.btn:hover{ filter: brightness(1.05); }
+.btn:active{ transform: scale(.985); }
+.btn.social img{ width: 22px; height: 22px; }
+
+/* ========= DIVISOR ========= */
+.divider-text{
+  position: relative;
+  text-align: center;
+  margin: 12px 0 16px;
+  color: var(--text-soft);
+  font-size: clamp(.9rem, 2.6vw, .95rem);
+}
+.divider-text::before,
+.divider-text::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  width:30%;
+  height:1px;
+  background: linear-gradient(90deg, transparent, #7e6a24 50%, transparent);
+}
+.divider-text::before{ left:0; }
+.divider-text::after{ right:0; }
+
+/* ========= CAMPOS ========= */
+.field{
+  margin-bottom: 12px;
+  position: relative;
+  width: 100%;
+}
+
+.field label{
+  display: block;
+  margin: 0 0 6px;
+  color: #d9d9d9;
+  font-size: clamp(.92rem, 2.5vw, .95rem);
+}
+
+.field input{
+  display: block;
+  width: 100%;
+  height: clamp(46px, 6.2vw, 40px);  /* tacto cómodo en móvil */
+  padding: 10px 44px 10px 12px;      /* espacio para 👁️ */
+  border-radius: 10px;
+  background: var(--field-bg);
+  border: 1px solid var(--stroke);
+  color: #f1f1f1;
+  outline: none;
+  transition: border .2s, box-shadow .2s;
+  line-height: 1.2;
+  font-size: clamp(.95rem, 2.8vw, 1rem);
+}
+
+.field input:focus{
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,.15);
+}
+
+/* ========= VER/OCULTAR PASSWORD ========= */
+.password-field{ position: relative; }
+
+/* OJO: eliminé el duplicado y fijé un solo set responsivo */
+.password-field .toggle-pass{
+  position: absolute;
+  right: clamp(8px, 2.2vw, 10px);
+  top: 67%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #cfcfcf;
+  cursor: pointer;
+  width: clamp(30px, 6vw, 34px);
+  height: clamp(30px, 6vw, 34px);
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: clamp(16px, 3.8vw, 18px);
+  z-index: 1;
+}
+.password-field .toggle-pass:hover{
+  background: rgba(255,255,255,.06);
+}
+
+/* ========= ERRORES ========= */
+.error{
+  display: block;
+  margin-top: 6px;
+  color: #ffb0b0;
+  font-size: clamp(.82rem, 2.4vw, .88rem);
+}
+
+/* ========= TÉRMINOS ========= */
+.terms{ margin: 6px 0 14px; }
+
+.checkbox{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(.9rem, 2.6vw, .95rem);
+}
+.checkbox input{ accent-color: var(--gold); }
+.checkbox a{ color: #e7cc6a; text-decoration: none; }
+.checkbox a:hover{ text-decoration: underline; }
+
+/* ========= BOTÓN PRINCIPAL ========= */
+.btn.primary{
+  background: linear-gradient(180deg, var(--gold), #a88720);
+  color: #141414;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.btn.primary:hover{ filter: brightness(1.07); }
+
+/* ========= LINK ALTERNO ========= */
+.alt-link{
+  text-align: center;
+  margin-top: 14px;
+  color: var(--text-soft);
+  font-size: clamp(.9rem, 2.6vw, .95rem);
+}
+.alt-link a{
+  color: #f0e6c8;
+  font-weight: 600;
+}
+.alt-link a:hover{ text-decoration: underline; }
+
+/* ========= MEDIA QUERIES ========= */
+/* Móviles pequeños */
+@media (max-width: 380px){
+  .card{ border-radius: 14px; padding: 16px; }
+  .social-group{ gap: 8px; }
+}
+
+/* Tablet */
+@media (min-width: 600px){
+  .card{ width: min(86vw, 540px); }
+}
+
+/* Desktop medio */
+@media (min-width: 900px){
+  .card{ width: 520px; }
+}
+
+/* Desktop grande */
+@media (min-width: 1200px){
+  .card{ width: 560px; padding: 32px; }
+}
+
+/* ========= ACCESIBILIDAD ========= */
+@media (prefers-reduced-motion: reduce){
+  .btn{ transition: none; }
+}

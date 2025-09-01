@@ -1,0 +1,34 @@
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Preload + carga del CSS general -->
+  <link rel="preload" href="/assets/css/admin.css" as="style">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <div class="admin-layout ready">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/assets/img/logo2.png" alt="Barbexa Logo"/>
+        <h1>BARBEXA</h1>
+        <div class="account-actions" style="margin-top:16px;">
+  
+    </div>
+      <button id="btnLogout" class="btn danger" style="width:100%;">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+      <nav class="nav" id="sideNav">
+        <a href="#" data-view="dashboard" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="#" data-view="manage"><i class="fa-solid fa-tools"></i> Manage</a>
+        <a href="#" data-view="users"><i class="fa-solid fa-users"></i> Users</a>
+        <a href="#" data-view="services"><i class="fa-solid fa-scissors"></i> Services</a>
+      </nav>
+    </aside>
+
+    <!-- Content swaps here without page reload -->
+    <main class="content">
+      <div id="viewContainer"></div>
+    </main>
+  </div>

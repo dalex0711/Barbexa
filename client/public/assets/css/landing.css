@@ -1,0 +1,511 @@
+/* ====== GLOBAL ====== */
+:root{
+  /* escalas fluidas */
+  --fs-h1: clamp(2rem, 3vw + 1.5rem, 4rem);
+  --fs-h2: clamp(1.4rem, 1.2vw + 1rem, 2.2rem);
+  --fs-h3: clamp(1.05rem, 0.6vw + 0.8rem, 1.5rem);
+  --container-pad: clamp(16px, 3vw, 40px);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #0a0603;
+  color: #fffffff1;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 1px;
+}
+
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); margin-bottom: 20px; color: #d4af37; }
+h3 { font-size: var(--fs-h3); margin: 15px 0; }
+
+/* ====== NAVBAR ====== */
+/* NAVBAR base */
+
+/* ====== NAVBAR ====== */
+.navbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+/* Logo */
+.logo img {
+  width: 200px;
+  height: auto;
+}
+
+/* Navegación */
+.nav-collapsible ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-collapsible ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 10px 12px;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+}
+
+
+/* Botón LOGIN */
+.btn-primary {
+  background: #d4af37;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 70px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #b99227;
+}
+
+/* Botón hamburguesa */
+.menu-toggle {
+  --size: 42px;
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid rgba(212,175,55,.45);
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Iconos dentro del botón */
+.menu-toggle .icon-bars,
+.menu-toggle .icon-down {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Mostrar hamburguesa por defecto */
+.menu-toggle .icon-down { display: none; }
+.menu-toggle[aria-expanded="true"] .icon-bars { display: none; }
+.menu-toggle[aria-expanded="true"] .icon-down { display: inline-block; }
+
+/* Estilo móvil */
+.nav-collapsible {
+  position: absolute;
+  right: 16px;
+  left: 16px;
+  top: 100%;
+  background: rgba(0,0,0,.9);
+  border: 1px solid rgba(212,175,55,.18);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.nav-collapsible.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-collapsible > ul {
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+.nav-collapsible a:hover {
+  color: #d4af37;
+}
+
+/* ===== Desktop (>992px): mostrar menú horizontal ===== */
+@media (min-width: 992px) {
+  .menu-toggle { display: none; }
+  .nav-collapsible {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    border: none;
+    background: transparent;
+  }
+  .nav-collapsible[hidden] { display: block !important; }
+  .nav-collapsible > ul {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 26px;
+    padding: 0;
+  }
+  .nav-collapsible a {
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+}
+
+
+
+
+/* ====== HERO ====== */
+.hero {
+    height: 100vh; /* para que ocupe toda la pantalla */
+  background-image: url("/assets/img/portada.jpg"); /* tu imagen */
+  background-size: cover; /* que cubra todo el fondo */
+  background-position: center; /* centrada */
+  background-repeat: no-repeat; /* evita que se repita */
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: url("/assets/img/portada.jpg") center/cover no-repeat;
+  position: relative;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5); /* capa oscura */
+}
+
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+}
+.hero-text {
+  position: relative;
+  z-index: 1;
+}
+.hero h1 span {
+  color: #d4af37;
+}
+.hero .slogan {
+  font-size: 1.2rem;
+  margin: 15px 0;
+  color: #ddd;
+  font-style: italic;
+}
+.hero-buttons {
+  margin-top: 20px;
+}
+.btn-primary {
+  background: #d4af37;
+  color: #000;
+  padding: 12px 25px;
+  margin: 10px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.btn-primary:hover {
+  background: #fff;
+  color: #000;
+}
+.btn-secondary {
+  border: 2px solid #d4af37;
+  padding: 12px 25px;
+  margin: 10px;
+  border-radius: 30px;
+  text-decoration: none;
+  color: #d4af37;
+  transition: 0.3s;
+}
+.btn-secondary:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+/* ====== SECCIONES ====== */
+.section {
+  padding: 70px 20px;
+  text-align: center;
+}
+.dark-bg {
+  background: #1a1a1a;
+}
+.cards {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.card {
+  background: #222;
+  padding: 20px;
+  border-radius: 15px;
+  width: 270px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid transparent;
+}
+.card:hover {
+  transform: translateY(-8px);
+  border-color: #d4af37;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+.card img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* ====== FOOTER ====== */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #000;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+footer p {
+  margin: 0;
+}
+#icon{
+  color: #d4af37;
+}
+/* ===== PRECIOS ===== */
+.price-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.price-card {
+  background: #111;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s;
+}
+
+.price-card:hover {
+  background: #1c1c1c;
+  transform: scale(1.02);
+}
+
+.price-icon {
+  background: #d4af37;
+  color: #fff;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.price-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.price-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.price-info p {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.price-info a {
+  color: #d4af37;
+  text-decoration: none;
+}
+
+.price-info a:hover {
+  text-decoration: underline;
+}
+
+.price-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+/* ====== CHATBOT ====== */
+/* ===== CHATBOT UI ===== */
+.chatbot-toggle {
+  position: fixed;
+  right: 22px;
+  bottom: 100px;   /* 🔥 lo subimos para no tapar al WhatsApp */
+  width: 70px;     /* ajusta según tamaño real de la imagen */
+  height: 70px;
+  background: none; /* quitamos color de fondo */
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 1200;
+
+  /* Imagen como fondo */
+  background-image: url("../../assets/img/chatbots.png");
+  background-size: contain;    /* 🔥 se ajusta al ancho/alto sin deformar */
+  background-repeat: no-repeat;
+  background-position: center;
+
+  transition: transform 0.3s ease;
+  animation: float 2.5s ease-in-out infinite;
+}
+
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;   /* 🔥 Más abajo que el chatbot */
+  right: 20px;
+  background: #25d366;
+  color: white;
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  animation: float 2.5s ease-in-out infinite;
+}
+
+.chatbot-box {
+  position: fixed;
+  right: 22px;
+  bottom: 100px; /* 🔥 el chat inicia justo ARRIBA del botón */
+  width: 340px;  /* ajusta según quieras */
+  height: 500px;
+  background: #1c1c1c;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  z-index: 1200; /* más alto que el botón */
+}
+
+
+/* header */
+.chatbot-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 14px; gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.chatbot-title{ display:flex; gap:10px; align-items:center; }
+.chatbot-title img{ width:42px; height:42px; border-radius:8px; object-fit:cover; }
+.chatbot-title strong{ display:block; color:#fff; font-size:0.95rem; }
+.chatbot-title small{ display:block; color:#bfbfbf; font-size:0.72rem; margin-top:2px; }
+
+.chatbot-controls button{ background:transparent; border:0; color:#fff; font-size:1rem; cursor:pointer; margin-left:6px; }
+.chatbot-controls .chatbot-voice{ color:#d4af37; }
+
+/* messages */
+.chatbot-messages{
+  flex:1; padding: 14px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;
+  scroll-behavior: smooth;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  
+}
+.message{ max-width:82%; padding:10px 12px; border-radius:12px; font-size:0.95rem; line-height:1.3; }
+.message.bot{ align-self:flex-start; background: rgba(255,255,255,0.03); color:#eaeaea; border: 1px solid rgba(212,175,55,0.06); }
+.message.user{ align-self:flex-end; background: linear-gradient(180deg,#d4af37,#b99227); color:#0b0b0b; font-weight:700; }
+
+/* options area (botones rápidos) */
+.chatbot-options{ padding: 12px; display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid rgba(255,255,255,0.03); }
+.chatbot-option{
+  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06);
+  padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.9rem;
+  transition: all .22s ease;
+}
+.chatbot-option:hover{ background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.3); color:#d4af37; }
+
+/* thumbs (imagenes de cortes) */
+.chat-thumb{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
+.chat-thumb img{ width:78px; height:64px; object-fit:cover; border-radius:8px; cursor:pointer; border:2px solid transparent; transition: transform .18s, border-color .18s; }
+.chat-thumb img:hover{ transform: translateY(-4px); border-color: rgba(212,175,55,0.7); }
+
+/* booking form */
+.chat-booking{ background:#0b0b0b; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); display:flex; flex-direction:column; gap:8px; }
+.chat-booking input, .chat-booking select{ padding:8px 10px; border-radius:8px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03); color:#fff; }
+.chat-booking button{ background:#d4af37; border: none; padding:8px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
+
+/* input area */
+.chatbot-input-area{ display:flex; gap:8px; padding:12px; border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(0deg, rgba(255,255,255,0.01), transparent); }
+.chatbot-input{ flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff; outline:none; }
+.chatbot-send{ background:transparent; border:1px solid rgba(212,175,55,0.25); color:#d4af37; padding:8px 12px; border-radius:10px; cursor:pointer; }
+
+/* small screens */
+@media (max-width:420px){
+  .chatbot-box{ right:12px; left:12px; width:auto; height:70vh; bottom:22px; }
+  .chat-thumb img{ width:64px; height:56px; }
+}
+/* Animaciones */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+/* Estados del chat */
+.chatbot-show {
+  animation: slideUp 0.4s ease forwards;
+}
+
+.chatbot-hide {
+  animation: slideDown 0.4s ease forwards;
+}
+
+
+/* Botón flotante WhatsApp */ .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; font-size: 2rem; width: 60px; /* ancho fijo */ height: 60px; /* alto fijo */ display: flex; /* centrado del ícono */ align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.3s ease; animation: float 2.5s ease-in-out infinite; } .whatsapp-float:hover { transform: scale(1.1); }
+
+/* Animación flotante */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
