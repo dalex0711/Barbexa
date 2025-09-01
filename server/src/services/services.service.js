@@ -12,7 +12,6 @@ import { validateName, isDecimal, isValidTime, decripValidate, validateArray } f
  * @throws {Error} If validation fails
  */
 export const postService = async (name, price, duration, description) => {
-    if (!validateName(name)) throw new Error('Invalid name format');
     if (isDecimal(price)) throw new Error('Price must be an integer');
     if (!isValidTime(duration)) throw new Error('Invalid duration format');
     if (!decripValidate(description)) throw new Error('Description too long');

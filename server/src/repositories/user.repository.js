@@ -21,7 +21,7 @@ export const userRepository = {
      */
     getBarberUser: async () => {
         const [rows] = await pool.query(`
-            SELECT u.username
+            SELECT u.username, u.id
             FROM users u
             JOIN rol r ON u.rol_id = r.id
             WHERE r.code_name = 'BARBER_02';
@@ -31,7 +31,7 @@ export const userRepository = {
 
     getUsers: async () => {
         const [rows] = await pool.query(`
-            SELECT u.username
+            SELECT u.username, u.email, u.id
             FROM users u
         `);
         return rows;

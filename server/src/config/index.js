@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 export const config = {
-  app: { port: Number(process.env.PORT) || 3000 },
+  app: { port: Number(process.env.PORT)},
   bd: {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,

@@ -16,7 +16,7 @@ app.use(cookieParser());       // Parse cookies for authentication/session handl
 app.use(cors({
     origin: 'http://localhost:5173', // URL de tu frontend
     credentials: true, // Muy importante para cookies
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -26,7 +26,6 @@ app.use(servicesRoutes);       // Services catalog endpoints
 app.use(userRoutes);           // User management endpoints
 app.use(reservationsRoutes);   // Reservations endpoints
 app.use(combosRoutes);
-
 // Global error handler (must be last)
 app.use(errorMiddleware);
 
