@@ -1,5 +1,5 @@
 
-const apiUrl = 'https://barbexa.onrender.com/';
+const apiUrl = 'https://barbexa.onrender.com';
 
 export async function apiRequest(method, endpoint = '', body = null, opts = {}) {
   try {
